@@ -18,7 +18,7 @@ export function ConfirmDeleteDialog({
 }: ConfirmDeleteDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent title={title} size="sm" open={open}>
+      <DialogContent title={title} size="sm">
         <div className="px-5 py-4">
           <p className="text-sm text-on-surface-variant">{description}</p>
           <div className="flex justify-end gap-2 mt-5">
