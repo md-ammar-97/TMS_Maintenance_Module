@@ -20,11 +20,14 @@ export function Checkbox({ checked, onCheckedChange, disabled, className, id }: 
       onCheckedChange={(v) => onCheckedChange(v === true)}
       disabled={disabled}
       className={cn(
-        'w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center transition-colors cursor-pointer outline-none',
-        checked ? 'bg-blue-600 border-blue-600' : 'bg-white border-gray-300',
+        'w-4 h-4 rounded flex-shrink-0 flex items-center justify-center transition-colors cursor-pointer outline-none border',
         disabled && 'opacity-50 cursor-not-allowed',
         className
       )}
+      style={checked
+        ? { background: 'var(--primary)', borderColor: 'var(--primary)' }
+        : { background: 'var(--surface)', borderColor: 'var(--border)' }
+      }
     >
       <RadixCheckbox.Indicator>
         <Check size={11} className="text-white" strokeWidth={3} />

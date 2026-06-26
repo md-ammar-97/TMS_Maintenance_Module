@@ -20,7 +20,7 @@ export function ConfirmDeleteDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent title={title} size="sm">
         <div className="px-5 py-4">
-          <p className="text-[13px] text-gray-600">{description}</p>
+          <p className="text-[13px]" style={{ color: 'var(--text-2)' }}>{description}</p>
           <div className="flex justify-end gap-2 mt-5">
             <Button variant="secondary" onClick={() => onOpenChange(false)}>Cancel</Button>
             <Button variant="destructive" onClick={() => { onConfirm(); onOpenChange(false) }}>Delete</Button>

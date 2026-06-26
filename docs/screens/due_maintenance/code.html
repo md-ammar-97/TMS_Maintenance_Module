@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Due Maintenance Dashboard - AXESTRACK</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#ffdad6",
+                        "surface-container-highest": "#32353d",
+                        "background": "#000000",
+                        "outline-variant": "#414754",
+                        "on-primary-fixed-variant": "#004397",
+                        "border": "#333333",
+                        "inverse-surface": "#e0e2ed",
+                        "tertiary": "#ffb596",
+                        "tertiary-container": "#ca4e00",
+                        "surface-container": "#1c1f27",
+                        "on-secondary-fixed-variant": "#6600b7",
+                        "on-tertiary-container": "#fffeff",
+                        "secondary-container": "#6807ba",
+                        "tertiary-fixed": "#ffdbcd",
+                        "secondary": "#dbb8ff",
+                        "on-surface-variant": "#c1c6d7",
+                        "on-background": "#e0e2ed",
+                        "error-container": "#93000a",
+                        "primary": "#aec6ff",
+                        "error": "#ee0000",
+                        "on-tertiary": "#581e00",
+                        "on-primary-container": "#ffffff",
+                        "on-secondary-fixed": "#2b0052",
+                        "on-tertiary-fixed-variant": "#7d2d00",
+                        "surface-container-high": "#272a32",
+                        "inverse-on-surface": "#2d3039",
+                        "surface-container-lowest": "#0b0e15",
+                        "surface-bright": "#363942",
+                        "surface-container-low": "#181b23",
+                        "on-tertiary-fixed": "#360f00",
+                        "surface-tint": "#aec6ff",
+                        "primary-fixed-dim": "#aec6ff",
+                        "on-primary-fixed": "#001a43",
+                        "primary-container": "#0070f3",
+                        "inverse-primary": "#0059c5",
+                        "primary-fixed": "#d8e2ff",
+                        "on-primary": "#002e6b",
+                        "warning": "#f5a623",
+                        "surface-variant": "#32353d",
+                        "surface": "#111111",
+                        "success": "#0070f3",
+                        "on-surface": "#e0e2ed",
+                        "on-error": "#690005",
+                        "tertiary-fixed-dim": "#ffb596",
+                        "on-secondary-container": "#d0a6ff",
+                        "surface-dim": "#10131b",
+                        "secondary-fixed": "#efdbff",
+                        "secondary-fixed-dim": "#dbb8ff",
+                        "outline": "#8b90a0",
+                        "on-secondary": "#470083"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "space-unit": "4px",
+                        "container-max": "1440px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Geist"],
+                        "body-md": ["Geist"],
+                        "label-md": ["JetBrains Mono"],
+                        "headline-lg-mobile": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "headline-xl": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "label-sm": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-xl": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.background'); color: theme('colors.on-surface'); }
+    </style>
+</head>
+<body class="flex bg-background text-on-surface h-screen overflow-hidden font-body-md">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col h-screen overflow-y-auto py-4 bg-surface-container-lowest border-r border-border fixed left-0 top-0 w-64 z-40">
+<div class="px-gutter mb-8">
+<div class="flex items-center gap-3">
+<img class="w-8 h-8 rounded-DEFAULT object-cover" data-alt="A minimalist, highly technical logo for a developer-centric logistics platform, featuring sharp geometric lines in a dark mode aesthetic, conveying high-performance and precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsGTDCz33E9OR1zEhEPuql5STLVToJSCo2LRqjyE03-_990eQd0wYKmMADN8gKwb5wJPLMfsbnq05L15PPNYjBHRR9i5JQi-Ddq7TTaUXwtRuFy8q3WyfFXtdY5QGvPi7IlXvh5dwPKAKEHJIgroAX0pmL4BZ_7buf08zu2Y5Ij1k45DXGmPnLvINxkZysZ5AAFULlZNUjSAr3MGtzQ3T7_uqsiIZ2mFTn_qKu7_FHUfvUT8DA0Zo6R4mRvWi_XSsABnn2Q4hr19k"/>
+<div>
+<h1 class="text-body-lg font-headline-md font-bold text-on-surface">FreightNXT</h1>
+<p class="text-label-sm font-label-sm text-on-surface-variant">(by Axestrack)</p>
+</div>
+</div>
+</div>
+<div class="px-4 mb-6">
+<button class="w-full bg-primary-container text-on-primary-container hover:bg-surface-container-high transition-all text-label-md font-label-md py-2 rounded-lg flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+                Create Work Order
+            </button>
+</div>
+<div class="flex-1 flex flex-col gap-1">
+<a class="text-on-surface-variant hover:text-on-surface px-4 py-2 mx-2 my-1 rounded-lg flex items-center gap-3 text-label-md font-label-md transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_today</span> Plan
+            </a>
+<a class="text-on-surface-variant hover:text-on-surface px-4 py-2 mx-2 my-1 rounded-lg flex items-center gap-3 text-label-md font-label-md transition-colors" href="#">
+<span class="material-symbols-outlined">assignment</span> Logs
+            </a>
+<a class="text-on-surface-variant hover:text-on-surface px-4 py-2 mx-2 my-1 rounded-lg flex items-center gap-3 text-label-md font-label-md transition-colors" href="#">
+<span class="material-symbols-outlined">category</span> Maintenance Types
+            </a>
+<a class="text-on-surface-variant hover:text-on-surface px-4 py-2 mx-2 my-1 rounded-lg flex items-center gap-3 text-label-md font-label-md transition-colors" href="#">
+<span class="material-symbols-outlined">receipt_long</span> Bills
+            </a>
+<a class="text-on-surface-variant hover:text-on-surface px-4 py-2 mx-2 my-1 rounded-lg flex items-center gap-3 text-label-md font-label-md transition-colors" href="#">
+<span class="material-symbols-outlined">settings_input_component</span> Parts
+            </a>
+<a class="bg-primary-container text-on-primary-container font-semibold rounded-lg mx-2 my-1 px-4 py-2 flex items-center gap-3 text-label-md font-label-md scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">priority_high</span> Due Maintenance
+            </a>
+<a class="text-on-surface-variant hover:text-on-surface px-4 py-2 mx-2 my-1 rounded-lg flex items-center gap-3 text-label-md font-label-md transition-colors" href="#">
+<span class="material-symbols-outlined">fact_check</span> Inspection
+            </a>
+</div>
+<div class="mt-auto border-t border-border pt-4 flex flex-col gap-1">
+<a class="text-on-surface-variant hover:text-on-surface px-4 py-2 mx-2 my-1 rounded-lg flex items-center gap-3 text-label-md font-label-md transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span> Settings
+            </a>
+<a class="text-on-surface-variant hover:text-on-surface px-4 py-2 mx-2 my-1 rounded-lg flex items-center gap-3 text-label-md font-label-md transition-colors" href="#">
+<span class="material-symbols-outlined">help</span> Support
+            </a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col md:ml-64 h-full relative">
+<!-- TopNavBar -->
+<header class="bg-surface flex justify-between items-center h-16 px-gutter w-full sticky top-0 z-50 border-b border-border">
+<div class="flex items-center gap-4">
+<button class="md:hidden text-on-surface"><span class="material-symbols-outlined">menu</span></button>
+<span class="text-headline-lg font-headline-lg font-bold text-primary hidden md:block">AXESTRACK</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="bg-surface-container-low border border-border rounded-full py-1.5 pl-10 pr-4 text-body-sm font-body-sm focus:border-primary focus:ring-0 text-on-surface w-64 placeholder-on-surface-variant" placeholder="Search..." type="text"/>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors p-2 rounded-full hover:bg-surface-container-low">
+<span class="material-symbols-outlined">light_mode</span>
+</button>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors p-2 rounded-full hover:bg-surface-container-low relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<img class="w-8 h-8 rounded-full border border-border object-cover cursor-pointer" data-alt="A professional headshot of an engineer in a dark mode studio setting, high contrast, clean minimalist background, conveying technical expertise." src="https://lh3.googleusercontent.com/aida-public/AB6AXuChFQ6FqzIT3LwH0W8jC1sNJZVFwIHnNpnIcpVgpw6-_1jqUWBnythuMKLz3S7f8RSheVopcgbVq6-F8O-_obHcPonDJ43j_DsPVtNf_E6uh3XRUsVIEVKOpZGTX_3hf4otAoR__ezlgW9N2IOp6dDvFVBaF0u6dgkeHP-eYT26E1dneYqfe9ebG36l9p42OrnLHAQN8Mmxbafq7EZske9Udn0ta9YdnsQmTLPUviPpUboe7c2iYlaw24E_1O1_TULAyR3RtqxZ0oE"/>
+</div>
+</header>
+<!-- Page Canvas -->
+<main class="flex-1 overflow-y-auto p-gutter bg-background relative z-10">
+<div class="max-w-container-max mx-auto space-y-8">
+<!-- Page Header & Actions -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div>
+<h2 class="text-headline-md font-headline-md text-on-surface">Due Maintenance</h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">Review and manage upcoming and overdue service requirements.</p>
+</div>
+<div class="flex items-center gap-2">
+<button class="border border-border text-on-surface px-4 py-2 rounded-DEFAULT text-label-md font-label-md hover:bg-surface-container-low transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 18px;">download</span> Export
+                        </button>
+</div>
+</div>
+<!-- Tabs & Filters -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-surface p-1 rounded-lg border border-border self-start inline-flex w-full sm:w-auto">
+<div class="flex gap-1 w-full sm:w-auto">
+<button class="flex-1 sm:flex-none bg-surface-container-high text-on-surface px-6 py-2 rounded-DEFAULT text-label-md font-label-md border border-border border-b-primary shadow-sm relative after:content-[''] after:absolute after:bottom-[-1px] after:left-0 after:w-full after:h-[2px] after:bg-primary">By Mileage</button>
+<button class="flex-1 sm:flex-none text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface px-6 py-2 rounded-DEFAULT text-label-md font-label-md transition-colors border border-transparent">By Date</button>
+</div>
+<div class="hidden sm:flex items-center gap-2 px-2">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Filter:</span>
+<select class="bg-surface-container-low border border-border text-label-md font-label-md text-on-surface rounded-DEFAULT py-1 pl-3 pr-8 focus:ring-0 focus:border-primary">
+<option>All Units</option>
+<option>Trucks</option>
+<option>Trailers</option>
+</select>
+</div>
+</div>
+<!-- High-Density Data Table Panel -->
+<div class="bg-surface rounded-lg border border-border overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse whitespace-nowrap">
+<thead>
+<tr class="bg-surface-container-low border-b border-border">
+<th class="px-4 py-3 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Unit No.</th>
+<th class="px-4 py-3 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Type</th>
+<th class="px-4 py-3 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Plan Name</th>
+<th class="px-4 py-3 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider text-right">Last Service (Mi)</th>
+<th class="px-4 py-3 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider text-right">Current (Mi)</th>
+<th class="px-4 py-3 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider text-right">Due In</th>
+<th class="px-4 py-3 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider text-center">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border text-body-sm font-body-sm">
+<!-- Row 1: Critical -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-4 py-3 font-label-md text-on-surface">TRK-9021</td>
+<td class="px-4 py-3 text-on-surface-variant">Heavy Duty</td>
+<td class="px-4 py-3 text-on-surface">Engine Overhaul</td>
+<td class="px-4 py-3 text-right font-label-md text-on-surface-variant">450,000</td>
+<td class="px-4 py-3 text-right font-label-md text-on-surface">501,200</td>
+<td class="px-4 py-3 text-right">
+<span class="inline-flex items-center px-2 py-1 rounded bg-error-container text-on-error-container text-label-sm font-label-sm">
+                                            -1,200 mi
+                                        </span>
+</td>
+<td class="px-4 py-3 text-center">
+<button class="text-primary hover:text-primary-container text-label-sm font-label-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1 mx-auto">
+<span class="material-symbols-outlined" style="font-size: 16px;">add_task</span> Log
+                                        </button>
+</td>
+</tr>
+<!-- Row 2: Warning -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-4 py-3 font-label-md text-on-surface">TRK-8834</td>
+<td class="px-4 py-3 text-on-surface-variant">Medium Duty</td>
+<td class="px-4 py-3 text-on-surface">Brake Inspection</td>
+<td class="px-4 py-3 text-right font-label-md text-on-surface-variant">120,500</td>
+<td class="px-4 py-3 text-right font-label-md text-on-surface">144,800</td>
+<td class="px-4 py-3 text-right">
+<span class="inline-flex items-center px-2 py-1 rounded bg-warning text-[#362400] text-label-sm font-label-sm">
+                                            +200 mi
+                                        </span>
+</td>
+<td class="px-4 py-3 text-center">
+<button class="text-primary hover:text-primary-container text-label-sm font-label-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1 mx-auto">
+<span class="material-symbols-outlined" style="font-size: 16px;">add_task</span> Log
+                                        </button>
+</td>
+</tr>
+<!-- Row 3: Upcoming -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-4 py-3 font-label-md text-on-surface">TRL-409</td>
+<td class="px-4 py-3 text-on-surface-variant">Reefer</td>
+<td class="px-4 py-3 text-on-surface">PM A-Service</td>
+<td class="px-4 py-3 text-right font-label-md text-on-surface-variant">45,000</td>
+<td class="px-4 py-3 text-right font-label-md text-on-surface">52,100</td>
+<td class="px-4 py-3 text-right">
+<span class="inline-flex items-center px-2 py-1 rounded bg-surface-bright text-on-surface-variant border border-border text-label-sm font-label-sm">
+                                            +2,900 mi
+                                        </span>
+</td>
+<td class="px-4 py-3 text-center">
+<button class="text-primary hover:text-primary-container text-label-sm font-label-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1 mx-auto">
+<span class="material-symbols-outlined" style="font-size: 16px;">add_task</span> Log
+                                        </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 border-t border-border flex justify-between items-center bg-surface-container-lowest">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Showing 1 to 3 of 42 entries</span>
+<div class="flex gap-1">
+<button class="p-1 border border-border rounded text-on-surface-variant hover:bg-surface hover:text-on-surface transition-colors disabled:opacity-50"><span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span></button>
+<button class="p-1 border border-border rounded text-on-surface-variant hover:bg-surface hover:text-on-surface transition-colors"><span class="material-symbols-outlined" style="font-size: 20px;">chevron_right</span></button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

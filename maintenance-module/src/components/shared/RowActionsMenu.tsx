@@ -43,7 +43,7 @@ export function RowActionsMenu({
         ))}
         {onDelete && (
           <>
-            {(onView || onEdit || extraItems?.length) && <DropdownMenuSeparator className="my-1 border-gray-100" />}
+            {(onView || onEdit || extraItems?.length) && <DropdownMenuSeparator className="my-1" style={{ borderColor: 'var(--border)' }} />}
             <DropdownMenuItem onClick={onDelete} icon={<Trash2 size={13} />} destructive>
               {deleteLabel}
             </DropdownMenuItem>

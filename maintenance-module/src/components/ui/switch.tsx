@@ -18,10 +18,10 @@ export function Switch({ checked, onCheckedChange, disabled, className }: Switch
       disabled={disabled}
       className={cn(
         'w-9 h-5 rounded-full transition-colors outline-none cursor-pointer',
-        checked ? 'bg-blue-600' : 'bg-gray-200',
         disabled && 'opacity-50 cursor-not-allowed',
         className
       )}
+      style={{ background: checked ? 'var(--primary)' : 'var(--surface-high)' }}
     >
       <RadixSwitch.Thumb
         className="block w-4 h-4 rounded-full bg-white shadow-sm transition-transform data-[state=checked]:translate-x-4 translate-x-0.5"

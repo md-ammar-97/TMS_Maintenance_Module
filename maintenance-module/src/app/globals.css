@@ -1,167 +1,155 @@
 @import "tailwindcss";
 
+/* Enable class-based dark mode for Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── Light mode (default) ────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #111827;
+  --bg:             #f9fafb;
+  --surface:        #ffffff;
+  --surface-dim:    #f3f4f6;
+  --surface-high:   #e5e7eb;
+  --border:         #e5e7eb;
+  --border-subtle:  #f3f4f6;
+  --text-1:         #111827;
+  --text-2:         #374151;
+  --text-3:         #6b7280;
+  --text-4:         #9ca3af;
+  --sidebar-bg:     #ffffff;
+  --topbar-bg:      #ffffff;
+  --primary:        #2563eb;
+  --primary-hover:  #1d4ed8;
 }
 
+/* ── Dark mode ───────────────────────────────────────── */
+.dark {
+  --bg:             #0b0e15;
+  --surface:        #1c1f27;
+  --surface-dim:    #181b23;
+  --surface-high:   #272a32;
+  --border:         #333333;
+  --border-subtle:  #414754;
+  --text-1:         #e0e2ed;
+  --text-2:         #c1c6d7;
+  --text-3:         #8b90a0;
+  --text-4:         #5a5f70;
+  --sidebar-bg:     #181b23;
+  --topbar-bg:      #111111;
+  --primary:        #0070f3;
+  --primary-hover:  #005cc8;
+}
+
+/* ── Base ───────────────────────────────────────────── */
+* { box-sizing: border-box; }
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text-1);
+  font-family: 'Geist', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-* {
-  box-sizing: border-box;
-}
+/* ── Scrollbar ──────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-subtle); }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #f1f5f9; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-/* Dialog/Sheet overlay */
+/* ── Dialog overlay ─────────────────────────────────── */
 .dialog-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.6);
   z-index: 50;
   animation: fadeIn 150ms ease;
 }
 
-/* Right-side sheet/drawer */
+/* ── Right-side sheet/drawer ────────────────────────── */
 .sheet-content {
   position: fixed;
   right: 0;
   top: 0;
   height: 100%;
   z-index: 51;
-  background: white;
-  box-shadow: -4px 0 24px rgba(0,0,0,0.12);
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
   animation: slideInRight 200ms ease;
 }
 
-/* Centered modal */
+/* ── Centered modal ─────────────────────────────────── */
 .modal-content {
   position: fixed;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
   z-index: 51;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
   animation: scaleIn 150ms ease;
   max-height: 90vh;
   overflow-y: auto;
 }
 
-/* Dropdown menu */
+/* ── Dropdown / Popover ─────────────────────────────── */
 .dropdown-content {
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
-  min-width: 160px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   z-index: 100;
   animation: slideInFromBottom 120ms ease;
 }
 
-/* Popover */
 .popover-content {
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.05);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
   z-index: 100;
   animation: slideInFromBottom 120ms ease;
 }
 
+/* ── Keyframes ──────────────────────────────────────── */
 @keyframes fadeIn {
   from { opacity: 0; }
-  to { opacity: 1; }
+  to   { opacity: 1; }
 }
-
 @keyframes slideInRight {
   from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+  to   { transform: translateX(0); }
 }
-
 @keyframes slideInFromBottom {
   from { transform: translateY(4px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  to   { transform: translateY(0); opacity: 1; }
 }
-
 @keyframes scaleIn {
   from { transform: translate(-50%, -50%) scale(0.97); opacity: 0; }
-  to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  to   { transform: translate(-50%, -50%) scale(1);    opacity: 1; }
 }
 
-/* Table horizontal scroll */
-.table-container {
-  overflow-x: auto;
-  width: 100%;
-}
-
-/* Truncate cell text */
-.cell-truncate {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  max-width: 200px;
-}
-
-/* Toggle group */
-.toggle-group {
-  display: inline-flex;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.toggle-item {
-  padding: 0 14px;
-  height: 32px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  background: #f3f4f6;
-  color: #6b7280;
-  border: none;
-  transition: background 150ms, color 150ms;
-}
-
-.toggle-item:first-child { border-right: 1px solid #e5e7eb; }
-
-.toggle-item.active {
-  background: #2563eb;
-  color: white;
-}
-
-/* Inspection grid item control */
+/* ── Inspection toggle buttons ──────────────────────── */
 .inspection-control {
   display: inline-flex;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 4px;
   overflow: hidden;
 }
-
 .inspection-btn {
   padding: 2px 8px;
   font-size: 11px;
   font-weight: 500;
   cursor: pointer;
-  background: #f3f4f6;
-  color: #6b7280;
+  background: var(--surface-dim);
+  color: var(--text-3);
   border: none;
-  border-right: 1px solid #e5e7eb;
+  border-right: 1px solid var(--border);
   transition: background 100ms, color 100ms;
 }
-
 .inspection-btn:last-child { border-right: none; }
-.inspection-btn.ok-active { background: #d1fae5; color: #065f46; }
-.inspection-btn.def-active { background: #fee2e2; color: #991b1b; }
+.inspection-btn.ok-active  { background: #065f46; color: #d1fae5; }
+.inspection-btn.def-active { background: #7f1d1d; color: #fee2e2; }

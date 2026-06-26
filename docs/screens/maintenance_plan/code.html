@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Maintenance Plan - FreightNXT</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#ffdad6",
+                        "surface-container-highest": "#32353d",
+                        "background": "#000000",
+                        "outline-variant": "#414754",
+                        "on-primary-fixed-variant": "#004397",
+                        "border": "#333333",
+                        "inverse-surface": "#e0e2ed",
+                        "tertiary": "#ffb596",
+                        "tertiary-container": "#ca4e00",
+                        "surface-container": "#1c1f27",
+                        "on-secondary-fixed-variant": "#6600b7",
+                        "on-tertiary-container": "#fffeff",
+                        "secondary-container": "#6807ba",
+                        "tertiary-fixed": "#ffdbcd",
+                        "secondary": "#dbb8ff",
+                        "on-surface-variant": "#c1c6d7",
+                        "on-background": "#e0e2ed",
+                        "error-container": "#93000a",
+                        "primary": "#aec6ff",
+                        "error": "#ee0000",
+                        "on-tertiary": "#581e00",
+                        "on-primary-container": "#ffffff",
+                        "on-secondary-fixed": "#2b0052",
+                        "on-tertiary-fixed-variant": "#7d2d00",
+                        "surface-container-high": "#272a32",
+                        "inverse-on-surface": "#2d3039",
+                        "surface-container-lowest": "#0b0e15",
+                        "surface-bright": "#363942",
+                        "surface-container-low": "#181b23",
+                        "on-tertiary-fixed": "#360f00",
+                        "surface-tint": "#aec6ff",
+                        "primary-fixed-dim": "#aec6ff",
+                        "on-primary-fixed": "#001a43",
+                        "primary-container": "#0070f3",
+                        "inverse-primary": "#0059c5",
+                        "primary-fixed": "#d8e2ff",
+                        "on-primary": "#002e6b",
+                        "warning": "#f5a623",
+                        "surface-variant": "#32353d",
+                        "surface": "#111111",
+                        "success": "#0070f3",
+                        "on-surface": "#e0e2ed",
+                        "on-error": "#690005",
+                        "tertiary-fixed-dim": "#ffb596",
+                        "on-secondary-container": "#d0a6ff",
+                        "surface-dim": "#10131b",
+                        "secondary-fixed": "#efdbff",
+                        "secondary-fixed-dim": "#dbb8ff",
+                        "outline": "#8b90a0",
+                        "on-secondary": "#470083"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "space-unit": "4px",
+                        "container-max": "1440px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Geist"],
+                        "body-md": ["Geist"],
+                        "label-md": ["JetBrains Mono"],
+                        "headline-lg-mobile": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "headline-xl": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "label-sm": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-xl": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.background'); color: theme('colors.on-background'); }
+        .material-symbols-outlined { font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal; font-size: 24px; line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; word-wrap: normal; direction: ltr; font-feature-settings: 'liga'; -webkit-font-feature-settings: 'liga'; -webkit-font-smoothing: antialiased; }
+    </style>
+</head>
+<body class="flex min-h-screen">
+<!-- SideNavBar -->
+<nav class="hidden md:flex bg-surface-container-low dark:bg-surface-container-lowest fixed left-0 top-0 h-full w-64 border-r border-border flex-col overflow-y-auto py-4 z-40">
+<div class="px-gutter mb-8">
+<h1 class="text-body-lg font-headline-md font-bold text-on-surface">FreightNXT</h1>
+<span class="text-label-sm font-label-sm text-on-surface-variant">(by Axestrack)</span>
+</div>
+<div class="px-4 mb-6">
+<button class="w-full bg-primary-container text-on-primary-container hover:bg-primary-container/90 transition-colors py-2 px-4 rounded-DEFAULT text-label-md font-label-md flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 18px;">add</span>
+                Create Work Order
+            </button>
+</div>
+<div class="flex-1 space-y-1">
+<a class="bg-primary-container text-on-primary-container font-semibold rounded-lg mx-2 my-1 px-4 py-2 flex items-center gap-3 text-label-md font-label-md scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+                Plan
+            </a>
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all px-4 py-2 mx-2 my-1 rounded-lg flex items-center gap-3 text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined">assignment</span>
+                Logs
+            </a>
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all px-4 py-2 mx-2 my-1 rounded-lg flex items-center gap-3 text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined">category</span>
+                Maintenance Types
+            </a>
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all px-4 py-2 mx-2 my-1 rounded-lg flex items-center gap-3 text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+                Bills
+            </a>
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all px-4 py-2 mx-2 my-1 rounded-lg flex items-center gap-3 text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined">settings_input_component</span>
+                Parts
+            </a>
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all px-4 py-2 mx-2 my-1 rounded-lg flex items-center gap-3 text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined">priority_high</span>
+                Due Maintenance
+            </a>
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all px-4 py-2 mx-2 my-1 rounded-lg flex items-center gap-3 text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined">fact_check</span>
+                Inspection
+            </a>
+</div>
+<div class="mt-auto border-t border-border pt-4 space-y-1">
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all px-4 py-2 mx-2 my-1 rounded-lg flex items-center gap-3 text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all px-4 py-2 mx-2 my-1 rounded-lg flex items-center gap-3 text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined">help</span>
+                Support
+            </a>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-1 md:ml-64 flex flex-col min-h-screen bg-background">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-surface flex justify-between items-center h-16 px-gutter w-full sticky top-0 z-30 border-b border-border">
+<div class="flex items-center gap-4">
+<button class="md:hidden text-on-surface-variant">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="text-headline-md font-headline-md font-bold text-primary-container dark:text-primary md:hidden">
+                    AXESTRACK
+                </div>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex items-center bg-surface-container-low border border-border rounded-DEFAULT px-3 py-1.5 focus-within:border-primary transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant text-sm mr-2">search</span>
+<input class="bg-transparent border-none text-body-sm font-body-sm text-on-surface focus:ring-0 p-0 w-48 placeholder-on-surface-variant" placeholder="Search..." type="text"/>
+</div>
+<button class="text-on-surface-variant hover:bg-surface-container-low transition-colors p-2 rounded-full">
+<span class="material-symbols-outlined">light_mode</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-low transition-colors p-2 rounded-full relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-border overflow-hidden ml-2 cursor-pointer">
+<img class="w-full h-full object-cover" data-alt="A clean, minimalist 3D rendering of a generic user avatar placeholder, stylized in dark grey and soft blue tones against a pure black background. Professional corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0ta0L6MISC4y6JXmylYDaPpvLg796r3NWUUfAAj_PzG2cMgkxjzPjcZrinzgXrwPu9BeU2u3JBcOBZJ6rrBlUmtRziRappaV3-PbfYnkYcrDN7JMDOD-xlwtoVy8fr1Y1aSaQuUbKTjt4Ah6t5w07MTUxSC9lyXfB1Vn0mOhJ-YoD4S4s9JXw2kj5ZUX0AlLgesctdXz-uMEX-7InSVrkCjeIhItl-QtNq5TS1dLmorohmfDxXIEj3_venkB8OnxbR3oP4odeKkI"/>
+</div>
+</div>
+</header>
+<div class="flex-1 p-gutter max-w-container-max mx-auto w-full flex flex-col gap-6">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+<div>
+<h2 class="text-headline-lg font-headline-lg text-on-surface mb-1">Plan</h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Manage and organize your fleet's maintenance schedules.</p>
+</div>
+<button class="bg-primary-container text-on-primary-container hover:bg-primary-container/90 transition-colors py-2 px-4 rounded-DEFAULT text-label-md font-label-md flex items-center gap-2 whitespace-nowrap border border-primary-container focus:ring-2 focus:ring-primary-container focus:ring-offset-2 focus:ring-offset-background">
+<span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+                    Create New Maintenance Plan
+                </button>
+</div>
+<!-- Filters & Controls Bar -->
+<div class="bg-surface border border-border rounded-lg p-4 flex flex-col lg:flex-row gap-4 items-center justify-between">
+<div class="flex flex-col sm:flex-row w-full lg:w-auto gap-4">
+<div class="flex items-center bg-surface-container-low border border-border rounded-DEFAULT px-3 py-2 focus-within:border-primary transition-colors w-full sm:w-64">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px] mr-2">search</span>
+<input class="bg-transparent border-none text-body-sm font-body-sm text-on-surface focus:ring-0 p-0 w-full placeholder-on-surface-variant" placeholder="Search plans..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<select class="bg-surface-container-low border border-border text-on-surface text-body-sm font-body-sm rounded-DEFAULT focus:ring-primary focus:border-primary px-3 py-2">
+<option value="">All Types</option>
+<option value="preventive">Preventive</option>
+<option value="corrective">Corrective</option>
+</select>
+<select class="bg-surface-container-low border border-border text-on-surface text-body-sm font-body-sm rounded-DEFAULT focus:ring-primary focus:border-primary px-3 py-2">
+<option value="">All Statuses</option>
+<option value="active">Active</option>
+<option value="inactive">Inactive</option>
+</select>
+</div>
+</div>
+<div class="flex items-center gap-2 w-full lg:w-auto justify-end">
+<button class="text-on-surface-variant border border-border hover:bg-surface-container-low transition-colors py-1.5 px-3 rounded-DEFAULT text-label-sm font-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                        More Filters
+                    </button>
+<button class="text-on-surface-variant border border-border hover:bg-surface-container-low transition-colors py-1.5 px-3 rounded-DEFAULT text-label-sm font-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                        Export
+                    </button>
+</div>
+</div>
+<!-- Data Table Container -->
+<div class="bg-surface border border-border rounded-lg overflow-hidden flex-1 flex flex-col">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-border">
+<th class="py-3 px-4 text-label-sm font-label-sm text-on-surface-variant w-12">Actions</th>
+<th class="py-3 px-4 text-label-sm font-label-sm text-on-surface-variant">Name</th>
+<th class="py-3 px-4 text-label-sm font-label-sm text-on-surface-variant">Maintenance Type</th>
+<th class="py-3 px-4 text-label-sm font-label-sm text-on-surface-variant">Interval Type</th>
+<th class="py-3 px-4 text-label-sm font-label-sm text-on-surface-variant text-right">Interval</th>
+<th class="py-3 px-4 text-label-sm font-label-sm text-on-surface-variant">Status</th>
+<th class="py-3 px-4 text-label-sm font-label-sm text-on-surface-variant hidden md:table-cell">Description</th>
+<th class="py-3 px-4 text-label-sm font-label-sm text-on-surface-variant text-right">Total OverDue</th>
+</tr>
+</thead>
+<tbody class="text-body-sm font-body-sm text-on-surface divide-y divide-border">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-lowest/50 transition-colors group">
+<td class="py-3 px-4">
+<button class="text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+<td class="py-3 px-4 font-medium text-primary-fixed-dim">30000 miles</td>
+<td class="py-3 px-4">Preventive Maintenance</td>
+<td class="py-3 px-4 text-on-surface-variant">Odometer</td>
+<td class="py-3 px-4 text-right font-label-md">30,000</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-success/10 text-success border border-success/20">
+                                        Active
+                                    </span>
+</td>
+<td class="py-3 px-4 text-on-surface-variant hidden md:table-cell truncate max-w-xs">Standard major service milestone for heavy-duty engines.</td>
+<td class="py-3 px-4 text-right">
+<span class="text-error font-medium">12 Vehicles</span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-lowest/50 transition-colors group">
+<td class="py-3 px-4">
+<button class="text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+<td class="py-3 px-4 font-medium text-primary-fixed-dim">Regular Maintenance</td>
+<td class="py-3 px-4">Routine Check</td>
+<td class="py-3 px-4 text-on-surface-variant">Time-based</td>
+<td class="py-3 px-4 text-right font-label-md">90 Days</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-success/10 text-success border border-success/20">
+                                        Active
+                                    </span>
+</td>
+<td class="py-3 px-4 text-on-surface-variant hidden md:table-cell truncate max-w-xs">Quarterly fluids and brake inspection.</td>
+<td class="py-3 px-4 text-right">
+<span class="text-on-surface">0 Vehicles</span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-lowest/50 transition-colors group opacity-60">
+<td class="py-3 px-4">
+<button class="text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+<td class="py-3 px-4 font-medium text-primary-fixed-dim">Winterization Prep</td>
+<td class="py-3 px-4">Seasonal</td>
+<td class="py-3 px-4 text-on-surface-variant">Date</td>
+<td class="py-3 px-4 text-right font-label-md">Nov 1</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface-container-highest text-on-surface-variant border border-outline-variant">
+                                        Inactive
+                                    </span>
+</td>
+<td class="py-3 px-4 text-on-surface-variant hidden md:table-cell truncate max-w-xs">Tire chains, block heater check, antifreeze flush.</td>
+<td class="py-3 px-4 text-right">
+<span class="text-on-surface-variant">-</span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-lowest/50 transition-colors group">
+<td class="py-3 px-4">
+<button class="text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+<td class="py-3 px-4 font-medium text-primary-fixed-dim">Annual DOT Inspection</td>
+<td class="py-3 px-4">Compliance</td>
+<td class="py-3 px-4 text-on-surface-variant">Time-based</td>
+<td class="py-3 px-4 text-right font-label-md">365 Days</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-success/10 text-success border border-success/20">
+                                        Active
+                                    </span>
+</td>
+<td class="py-3 px-4 text-on-surface-variant hidden md:table-cell truncate max-w-xs">Mandatory Department of Transportation annual check.</td>
+<td class="py-3 px-4 text-right">
+<span class="text-warning font-medium">3 Vehicles</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="border-t border-border p-4 flex items-center justify-between bg-surface-container-lowest/30 mt-auto">
+<p class="text-label-sm font-label-sm text-on-surface-variant">Showing 1 to 4 of 24 results</p>
+<div class="flex gap-1">
+<button class="p-1 border border-border rounded text-on-surface-variant hover:bg-surface-container-high disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</button>
+<button class="px-3 py-1 border border-primary text-primary bg-primary/10 rounded text-label-sm font-label-sm">1</button>
+<button class="px-3 py-1 border border-border text-on-surface hover:bg-surface-container-high rounded text-label-sm font-label-sm">2</button>
+<button class="px-3 py-1 border border-border text-on-surface hover:bg-surface-container-high rounded text-label-sm font-label-sm">3</button>
+<span class="px-2 py-1 text-on-surface-variant">...</span>
+<button class="p-1 border border-border rounded text-on-surface hover:bg-surface-container-high">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

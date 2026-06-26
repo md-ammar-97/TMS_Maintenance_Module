@@ -5,10 +5,11 @@ interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
   required?: boolean
 }
 
-export function Label({ className, children, required, ...props }: LabelProps) {
+export function Label({ className, children, required, style, ...props }: LabelProps) {
   return (
     <label
-      className={cn('block text-[11px] font-medium text-gray-500 uppercase tracking-wide mb-1', className)}
+      className={cn('block text-[11px] font-medium uppercase tracking-wide mb-1', className)}
+      style={{ color: 'var(--text-3)', ...style }}
       {...props}
     >
       {children}

@@ -1,4 +1,4 @@
-# Implementation Plan — Maintenance Module Frontend Prototype
+﻿# Implementation Plan â€” Maintenance Module Frontend Prototype
 
 Vercel-deployable, frontend-only. Build order is strict: foundation first, then pages in dependency order.
 
@@ -37,7 +37,7 @@ npm install @radix-ui/react-toggle-group
 
 ```ts
 const nextConfig = {
-  // Standard Next.js build (Vercel handles this natively — no static export needed)
+  // Standard Next.js build (Vercel handles this natively â€” no static export needed)
 }
 export default nextConfig
 ```
@@ -48,69 +48,69 @@ export default nextConfig
 
 ```
 src/
-├── app/
-│   ├── layout.tsx
-│   ├── page.tsx                          ← redirect to /maintenance/plan
-│   └── maintenance/
-│       ├── layout.tsx                    ← sidebar + top bar wrapper
-│       ├── plan/page.tsx
-│       ├── logs/page.tsx
-│       ├── types/page.tsx
-│       ├── bills/page.tsx
-│       ├── parts/page.tsx
-│       ├── due-maintenance/page.tsx
-│       └── inspection/
-│           ├── page.tsx
-│           └── new/page.tsx
-├── components/
-│   ├── layout/
-│   │   ├── Sidebar.tsx
-│   │   └── TopBar.tsx
-│   ├── shared/
-│   │   ├── PageHeader.tsx
-│   │   ├── DataTable.tsx
-│   │   ├── StatusBadge.tsx
-│   │   ├── RowActionsMenu.tsx
-│   │   ├── ColumnCustomizer.tsx
-│   │   ├── DateRangePicker.tsx
-│   │   ├── ExportButton.tsx
-│   │   └── ConfirmDeleteDialog.tsx
-│   ├── plan/
-│   │   ├── PlanTable.tsx
-│   │   ├── PlanModal.tsx
-│   │   └── TruckDetailsModal.tsx
-│   ├── logs/
-│   │   ├── LogsTable.tsx
-│   │   ├── LogModal.tsx
-│   │   └── LogsAdvancedFilters.tsx
-│   ├── types/
-│   │   ├── TypesTable.tsx
-│   │   └── TypeModal.tsx
-│   ├── bills/
-│   │   ├── BillsTable.tsx
-│   │   ├── BillModal.tsx
-│   │   └── BillLogItemRow.tsx
-│   ├── parts/
-│   │   ├── PartsTable.tsx
-│   │   └── PartModal.tsx
-│   ├── due-maintenance/
-│   │   ├── DueMaintenanceTable.tsx
-│   │   └── DueMaintenanceFilters.tsx
-│   ├── inspection/
-│   │   ├── InspectionSidebar.tsx
-│   │   ├── InspectionDetail.tsx
-│   │   └── InspectionItemGrid.tsx
-│   └── vendor/
-│       └── VendorModal.tsx
-├── context/
-│   └── AppContext.tsx
-├── lib/
-│   ├── seed.ts
-│   ├── session.ts
-│   ├── export.ts
-│   └── utils.ts
-└── types/
-    └── index.ts
+â”œâ”€â”€ app/
+â”‚   â”œâ”€â”€ layout.tsx
+â”‚   â”œâ”€â”€ page.tsx                          â† redirect to /maintenance/plan
+â”‚   â””â”€â”€ maintenance/
+â”‚       â”œâ”€â”€ layout.tsx                    â† sidebar + top bar wrapper
+â”‚       â”œâ”€â”€ plan/page.tsx
+â”‚       â”œâ”€â”€ logs/page.tsx
+â”‚       â”œâ”€â”€ types/page.tsx
+â”‚       â”œâ”€â”€ bills/page.tsx
+â”‚       â”œâ”€â”€ parts/page.tsx
+â”‚       â”œâ”€â”€ due-maintenance/page.tsx
+â”‚       â””â”€â”€ inspection/
+â”‚           â”œâ”€â”€ page.tsx
+â”‚           â””â”€â”€ new/page.tsx
+â”œâ”€â”€ components/
+â”‚   â”œâ”€â”€ layout/
+â”‚   â”‚   â”œâ”€â”€ Sidebar.tsx
+â”‚   â”‚   â””â”€â”€ TopBar.tsx
+â”‚   â”œâ”€â”€ shared/
+â”‚   â”‚   â”œâ”€â”€ PageHeader.tsx
+â”‚   â”‚   â”œâ”€â”€ DataTable.tsx
+â”‚   â”‚   â”œâ”€â”€ StatusBadge.tsx
+â”‚   â”‚   â”œâ”€â”€ RowActionsMenu.tsx
+â”‚   â”‚   â”œâ”€â”€ ColumnCustomizer.tsx
+â”‚   â”‚   â”œâ”€â”€ DateRangePicker.tsx
+â”‚   â”‚   â”œâ”€â”€ ExportButton.tsx
+â”‚   â”‚   â””â”€â”€ ConfirmDeleteDialog.tsx
+â”‚   â”œâ”€â”€ plan/
+â”‚   â”‚   â”œâ”€â”€ PlanTable.tsx
+â”‚   â”‚   â”œâ”€â”€ PlanModal.tsx
+â”‚   â”‚   â””â”€â”€ TruckDetailsModal.tsx
+â”‚   â”œâ”€â”€ logs/
+â”‚   â”‚   â”œâ”€â”€ LogsTable.tsx
+â”‚   â”‚   â”œâ”€â”€ LogModal.tsx
+â”‚   â”‚   â””â”€â”€ LogsAdvancedFilters.tsx
+â”‚   â”œâ”€â”€ types/
+â”‚   â”‚   â”œâ”€â”€ TypesTable.tsx
+â”‚   â”‚   â””â”€â”€ TypeModal.tsx
+â”‚   â”œâ”€â”€ bills/
+â”‚   â”‚   â”œâ”€â”€ BillsTable.tsx
+â”‚   â”‚   â”œâ”€â”€ BillModal.tsx
+â”‚   â”‚   â””â”€â”€ BillLogItemRow.tsx
+â”‚   â”œâ”€â”€ parts/
+â”‚   â”‚   â”œâ”€â”€ PartsTable.tsx
+â”‚   â”‚   â””â”€â”€ PartModal.tsx
+â”‚   â”œâ”€â”€ due-maintenance/
+â”‚   â”‚   â”œâ”€â”€ DueMaintenanceTable.tsx
+â”‚   â”‚   â””â”€â”€ DueMaintenanceFilters.tsx
+â”‚   â”œâ”€â”€ inspection/
+â”‚   â”‚   â”œâ”€â”€ InspectionSidebar.tsx
+â”‚   â”‚   â”œâ”€â”€ InspectionDetail.tsx
+â”‚   â”‚   â””â”€â”€ InspectionItemGrid.tsx
+â”‚   â””â”€â”€ vendor/
+â”‚       â””â”€â”€ VendorModal.tsx
+â”œâ”€â”€ context/
+â”‚   â””â”€â”€ AppContext.tsx
+â”œâ”€â”€ lib/
+â”‚   â”œâ”€â”€ seed.ts
+â”‚   â”œâ”€â”€ session.ts
+â”‚   â”œâ”€â”€ export.ts
+â”‚   â””â”€â”€ utils.ts
+â””â”€â”€ types/
+    â””â”€â”€ index.ts
 ```
 
 ---
@@ -120,18 +120,18 @@ src/
 Build in this exact order. Each phase depends on the previous.
 
 ```
-Phase 0 → Types + Seed Data
-Phase 1 → Context + Session Layer
-Phase 2 → Layout Shell (Sidebar + TopBar + Route wrapper)
-Phase 3 → Shared Components
-Phase 4 → Pages (dependency order below)
-Phase 5 → Cross-page linkage verification
-Phase 6 → Polish + Deploy
+Phase 0 â†’ Types + Seed Data
+Phase 1 â†’ Context + Session Layer
+Phase 2 â†’ Layout Shell (Sidebar + TopBar + Route wrapper)
+Phase 3 â†’ Shared Components
+Phase 4 â†’ Pages (dependency order below)
+Phase 5 â†’ Cross-page linkage verification
+Phase 6 â†’ Polish + Deploy
 ```
 
 ---
 
-## 4. PHASE 0 — TYPES & SEED DATA
+## 4. PHASE 0 â€” TYPES & SEED DATA
 
 ### 4.1 `src/types/index.ts`
 
@@ -172,7 +172,7 @@ Create all seed data arrays exactly as specified in `data_model.md`. Key entries
 import type { MaintenanceType, MaintenancePlan, Carrier, Vehicle, Trailer, Vendor, Part, MaintenanceLog, MaintenanceBill, DueMaintenanceRecord, Inspection } from '@/types'
 
 export const SEED_MAINTENANCE_TYPES: MaintenanceType[] = [
-  { id: 'mt-1', name: 'Oil Change', description: 'Every 30,000–35,000 Miles', createdAt: '2026-01-01T00:00:00Z' },
+  { id: 'mt-1', name: 'Oil Change', description: 'Every 30,000â€“35,000 Miles', createdAt: '2026-01-01T00:00:00Z' },
   { id: 'mt-2', name: 'Truck Tires', description: 'Steers - Change Every 100,000 Miles', createdAt: '2026-01-01T00:00:00Z' },
   { id: 'mt-3', name: 'Engine Work', description: '', createdAt: '2026-01-01T00:00:00Z' },
   { id: 'mt-4', name: 'Trailer Work', description: '', createdAt: '2026-01-01T00:00:00Z' },
@@ -212,7 +212,7 @@ export const SEED_CARRIERS: Carrier[] = [
 ]
 
 // Vehicles, Trailers, Vendors, Parts, Logs, Bills, DueMaintenance, Inspections
-// — see data_model.md for full seed values
+// â€” see data_model.md for full seed values
 ```
 
 Also export the inspection item constant arrays (`VEHICLE_INSPECTION_ITEMS`, `TRAILER_INSPECTION_ITEMS`) directly from this file.
@@ -295,7 +295,7 @@ export function generateId(): string {
 
 ---
 
-## 5. PHASE 1 — CONTEXT
+## 5. PHASE 1 â€” CONTEXT
 
 ### `src/context/AppContext.tsx`
 
@@ -315,7 +315,7 @@ import { generateId } from '@/lib/utils'
 //   function deleteMaintenanceType(id: string) { ... }
 // Each setter also calls setSessionData(KEY, newValue)
 
-// useEffect on mount: if isSeeded() → load from storage; else → seed all and markSeeded()
+// useEffect on mount: if isSeeded() â†’ load from storage; else â†’ seed all and markSeeded()
 ```
 
 **Context keys map:**
@@ -336,7 +336,7 @@ import { generateId } from '@/lib/utils'
 
 ---
 
-## 6. PHASE 2 — LAYOUT SHELL
+## 6. PHASE 2 â€” LAYOUT SHELL
 
 ### `src/app/layout.tsx`
 Root layout: imports global CSS, sets `<html lang="en">`, wraps in `<AppProvider>`.
@@ -386,9 +386,9 @@ Style per design.md:
 
 ---
 
-## 7. PHASE 3 — SHARED COMPONENTS
+## 7. PHASE 3 â€” SHARED COMPONENTS
 
-Build these before any page — every page uses them.
+Build these before any page â€” every page uses them.
 
 ### `PageHeader.tsx`
 Props: `title: string`, `icon: LucideIcon`, `actions?: ReactNode`
@@ -432,7 +432,7 @@ Props: `filename: string`, `columns: string[]`, `getData: () => Record<string, u
 
 ---
 
-## 8. PHASE 4 — PAGES (BUILD ORDER)
+## 8. PHASE 4 â€” PAGES (BUILD ORDER)
 
 Build pages in this order because later pages depend on earlier ones for dropdown data.
 
@@ -441,8 +441,8 @@ Build pages in this order because later pages depend on earlier ones for dropdow
 **Why first**: Every other page's modals need type dropdowns.
 
 Components:
-1. `TypesTable` — columns: Actions, Name (with avatar), Description
-2. `TypeModal` — create/edit, 2 fields
+1. `TypesTable` â€” columns: Actions, Name (with avatar), Description
+2. `TypeModal` â€” create/edit, 2 fields
 
 Key logic:
 - `getInitials(name)` for the avatar badge
@@ -454,9 +454,9 @@ Key logic:
 ### Page 2: Plan (`/maintenance/plan`)
 
 Components:
-1. `PlanTable` — 8 columns, seed 3 rows
-2. `PlanModal` — 8 fields, maintenance type dropdown from context
-3. `TruckDetailsModal` — hardcoded vehicle rows, rows-per-page control
+1. `PlanTable` â€” 8 columns, seed 3 rows
+2. `PlanModal` â€” 8 fields, maintenance type dropdown from context
+3. `TruckDetailsModal` â€” hardcoded vehicle rows, rows-per-page control
 
 Filter bar: 5 filters (general search, name, type dropdown, interval type, status) + clear button
 
@@ -465,8 +465,8 @@ Filter bar: 5 filters (general search, name, type dropdown, interval type, statu
 ### Page 3: Parts (`/maintenance/parts`)
 
 Components:
-1. `PartsTable` — 2 columns (Name, Description), seed 5 rows
-2. `PartModal` — 2 fields
+1. `PartsTable` â€” 2 columns (Name, Description), seed 5 rows
+2. `PartModal` â€” 2 fields
 
 Filter bar: Search + Name + Description inputs
 
@@ -477,14 +477,14 @@ Filter bar: Search + Name + Description inputs
 **Depends on**: Types, Plans, Carriers, Vehicles, Trailers, Vendors
 
 Components:
-1. `LogsTable` — 16 columns, Vehicle/Trailer tabs, column customizer
-2. `LogModal` — Vehicle/Trailer toggle, 12+ fields, nested create plan + vendor modals
-3. `LogsAdvancedFilters` — right-side drawer, 7 fields
-4. `VendorModal` — shared, also used in Bills
+1. `LogsTable` â€” 16 columns, Vehicle/Trailer tabs, column customizer
+2. `LogModal` â€” Vehicle/Trailer toggle, 12+ fields, nested create plan + vendor modals
+3. `LogsAdvancedFilters` â€” right-side drawer, 7 fields
+4. `VendorModal` â€” shared, also used in Bills
 
 Key logic:
 - Total Amount header display: `formatCurrency(logs.filter(l => l.unitType === activeTab).reduce((sum, l) => sum + l.amount, 0))`
-- PullRay button → toast placeholder
+- PullRay button â†’ toast placeholder
 
 ---
 
@@ -493,9 +493,9 @@ Key logic:
 **Depends on**: Types, Plans, Vehicles, Trailers, Carriers, Vendors, Parts, Logs
 
 Components:
-1. `BillsTable` — 10 columns, Vehicle/Trailer tabs
-2. `BillModal` — complex: bill header fields + dynamic log items section
-3. `BillLogItemRow` — single dynamic log item block within the bill modal
+1. `BillsTable` â€” 10 columns, Vehicle/Trailer tabs
+2. `BillModal` â€” complex: bill header fields + dynamic log items section
+3. `BillLogItemRow` â€” single dynamic log item block within the bill modal
 
 Key logic (most complex page):
 ```ts
@@ -537,8 +537,8 @@ function handleSaveBill(formData) {
 **Depends on**: Types, Plans, Vehicles, Trailers, Carriers, Logs
 
 Components:
-1. `DueMaintenanceTable` — 8 columns, color-coded "Due In" chips
-2. `DueMaintenanceFilters` — advanced filters drawer
+1. `DueMaintenanceTable` â€” 8 columns, color-coded "Due In" chips
+2. `DueMaintenanceFilters` â€” advanced filters drawer
 3. Reuses `LogModal` with prefill props
 
 Key logic:
@@ -562,18 +562,18 @@ function handleLogCreatedFromDue(dueRecord: DueMaintenanceRecord, newLog: Mainte
 **Depends on**: Carriers, Vehicles, Trailers
 
 Components:
-1. `InspectionSidebar` — left panel, unit list with clickable rows
-2. `InspectionDetail` — right panel, shows inspection records for selected unit
-3. `InspectionItemGrid` — 3-column grid, NA/OK/Def controls (used on new inspection page)
+1. `InspectionSidebar` â€” left panel, unit list with clickable rows
+2. `InspectionDetail` â€” right panel, shows inspection records for selected unit
+3. `InspectionItemGrid` â€” 3-column grid, NA/OK/Def controls (used on new inspection page)
 
 New inspection is a **full page** at `/maintenance/inspection/new`:
-- Back to list button → `router.push('/maintenance/inspection')`
+- Back to list button â†’ `router.push('/maintenance/inspection')`
 - Pass selected unit via URL query: `/maintenance/inspection/new?type=vehicle&unitId=v-1`
 - On save: `addInspection(newInspection)`, then `router.push('/maintenance/inspection?unit=v-1&type=vehicle')`
 
 ---
 
-## 9. PHASE 5 — CROSS-PAGE LINKAGE VERIFICATION
+## 9. PHASE 5 â€” CROSS-PAGE LINKAGE VERIFICATION
 
 After building all pages, manually test these flows:
 
@@ -589,7 +589,7 @@ After building all pages, manually test these flows:
 
 ---
 
-## 10. PHASE 6 — POLISH
+## 10. PHASE 6 â€” POLISH
 
 ### 10.1 Toast Notifications
 
@@ -612,14 +612,14 @@ Before deleting any record:
 ```
 Are you sure?
 This will remove "[record name]" from the list. This action cannot be undone.
-[Cancel]  [Delete]  ← red
+[Cancel]  [Delete]  â† red
 ```
 
 ### 10.3 Empty States
 
 Each table's empty state (when filters return 0 results):
 ```
-🔍
+ðŸ”
 No records found
 Try adjusting your filters.
 [Clear Filters]
@@ -645,7 +645,7 @@ git push -u origin main
 
 ### 11.2 Deploy via Vercel Dashboard
 
-1. Go to [vercel.com](https://vercel.com) → New Project
+1. Go to [vercel.com](https://vercel.com) â†’ New Project
 2. Import the GitHub repo
 3. Framework Preset: **Next.js** (auto-detected)
 4. No environment variables needed
@@ -703,3 +703,127 @@ After deploy, open the Vercel URL and confirm:
 | Phase 5: Linkage QA | ~1h |
 | Phase 6: Polish + Deploy | ~1h |
 | **Total** | **~18h** |
+
+
+---
+
+## 10. DARK / LIGHT MODE IMPLEMENTATION
+
+### 10.1 Overview
+
+The app ships with a **dark theme by default** (matching AxesTrack TMS screenshots). Users can toggle to light mode via a Sun/Moon button in the TopBar. Preference persists in `localStorage`.
+
+### 10.2 CSS Architecture (Tailwind v4)
+
+**`src/app/globals.css`:**
+```css
+@import "tailwindcss";
+
+/* Tailwind v4 class-based dark mode */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* light mode tokens */
+  --bg: #f9fafb;
+  --surface: #ffffff;
+  --surface-dim: #f3f4f6;
+  --surface-high: #e5e7eb;
+  --border: #e5e7eb;
+  --border-subtle: #f3f4f6;
+  --text-1: #111827;
+  --text-2: #374151;
+  --text-3: #6b7280;
+  --text-4: #9ca3af;
+  --sidebar-bg: #ffffff;
+  --topbar-bg: #ffffff;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+}
+
+.dark {
+  /* dark mode tokens */
+  --bg: #0b0e15;
+  --surface: #1c1f27;
+  --surface-dim: #181b23;
+  --surface-high: #272a32;
+  --border: #333333;
+  --border-subtle: #414754;
+  --text-1: #e0e2ed;
+  --text-2: #c1c6d7;
+  --text-3: #8b90a0;
+  --text-4: #5a5f70;
+  --sidebar-bg: #181b23;
+  --topbar-bg: #111111;
+  --primary: #0070f3;
+  --primary-hover: #005cc8;
+}
+```
+
+All modal, sheet, dropdown, and popover classes use `var(--surface)`, `var(--border)` in global CSS so Radix portal components (which mount outside the component tree) still inherit theme.
+
+### 10.3 ThemeProvider
+
+**`src/components/providers/ThemeProvider.tsx`:**
+```tsx
+'use client'
+import { createContext, useContext, useEffect, useState } from 'react'
+
+type Theme = 'dark' | 'light'
+interface ThemeContextValue { theme: Theme; toggle: () => void }
+const ThemeContext = createContext<ThemeContextValue>({ theme: 'dark', toggle: () => {} })
+
+export function useTheme() { return useContext(ThemeContext) }
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setTheme] = useState<Theme>('dark')
+  
+  useEffect(() => {
+    const stored = localStorage.getItem('theme') as Theme | null
+    const initial = stored ?? 'dark'
+    setTheme(initial)
+    document.documentElement.classList.toggle('dark', initial === 'dark')
+  }, [])
+  
+  function toggle() {
+    setTheme(prev => {
+      const next: Theme = prev === 'dark' ? 'light' : 'dark'
+      localStorage.setItem('theme', next)
+      document.documentElement.classList.toggle('dark', next === 'dark')
+      return next
+    })
+  }
+  
+  return <ThemeContext.Provider value={{ theme, toggle }}>{children}</ThemeContext.Provider>
+}
+```
+
+### 10.4 Root Layout
+
+**`src/app/layout.tsx`** — wrap with `ThemeProvider`, add `className="h-full dark"` as default:
+```tsx
+<html lang="en" className="h-full dark">
+  <body>
+    <ThemeProvider>
+      <AppProvider>{children}</AppProvider>
+    </ThemeProvider>
+  </body>
+</html>
+```
+
+### 10.5 TopBar Toggle Button
+
+```tsx
+import { useTheme } from '@/components/providers/ThemeProvider'
+const { theme, toggle } = useTheme()
+// ...
+<button onClick={toggle}>
+  {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+</button>
+```
+
+### 10.6 Component Coloring Rules
+
+- **NEVER** hardcode Tailwind color classes like `bg-white`, `bg-gray-100`, `text-gray-700`
+- **ALWAYS** use inline `style={{ background: 'var(--surface)', color: 'var(--text-1)' }}`
+- Status badges use semi-transparent RGBA that works in both themes (e.g., `rgba(0,112,243,0.12)`)
+- Radix overlay portals use global CSS classes (`.modal-content`, `.dropdown-content`) not component styles

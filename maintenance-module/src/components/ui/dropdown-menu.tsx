@@ -32,14 +32,15 @@ export function DropdownMenuItem({ children, className, destructive, icon, ...pr
     <RadixDropdown.Item
       className={cn(
         'flex items-center gap-2 px-3 py-2 text-[13px] cursor-pointer outline-none transition-colors',
-        destructive
-          ? 'text-red-600 hover:bg-red-50 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-700'
-          : 'text-gray-700 hover:bg-gray-50 data-[highlighted]:bg-gray-50 data-[highlighted]:text-gray-900',
+        destructive ? 'text-red-500' : '',
         className
       )}
+      style={destructive ? undefined : { color: 'var(--text-2)' }}
+      onMouseEnter={e => (e.currentTarget.style.background = destructive ? 'rgba(239,68,68,0.1)' : 'var(--surface-high)')}
+      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
       {...props}
     >
-      {icon && <span className="text-gray-400">{icon}</span>}
+      {icon && <span style={{ color: destructive ? undefined : 'var(--text-4)' }}>{icon}</span>}
       {children}
     </RadixDropdown.Item>
   )

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Maintenance Logs - FreightNXT</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#ffdad6",
+                        "surface-container-highest": "#32353d",
+                        "background": "#000000",
+                        "outline-variant": "#414754",
+                        "on-primary-fixed-variant": "#004397",
+                        "border": "#333333",
+                        "inverse-surface": "#e0e2ed",
+                        "tertiary": "#ffb596",
+                        "tertiary-container": "#ca4e00",
+                        "surface-container": "#1c1f27",
+                        "on-secondary-fixed-variant": "#6600b7",
+                        "on-tertiary-container": "#fffeff",
+                        "secondary-container": "#6807ba",
+                        "tertiary-fixed": "#ffdbcd",
+                        "secondary": "#dbb8ff",
+                        "on-surface-variant": "#c1c6d7",
+                        "on-background": "#e0e2ed",
+                        "error-container": "#93000a",
+                        "primary": "#aec6ff",
+                        "error": "#ee0000",
+                        "on-tertiary": "#581e00",
+                        "on-primary-container": "#ffffff",
+                        "on-secondary-fixed": "#2b0052",
+                        "on-tertiary-fixed-variant": "#7d2d00",
+                        "surface-container-high": "#272a32",
+                        "inverse-on-surface": "#2d3039",
+                        "surface-container-lowest": "#0b0e15",
+                        "surface-bright": "#363942",
+                        "surface-container-low": "#181b23",
+                        "on-tertiary-fixed": "#360f00",
+                        "surface-tint": "#aec6ff",
+                        "primary-fixed-dim": "#aec6ff",
+                        "on-primary-fixed": "#001a43",
+                        "primary-container": "#0070f3",
+                        "inverse-primary": "#0059c5",
+                        "primary-fixed": "#d8e2ff",
+                        "on-primary": "#002e6b",
+                        "warning": "#f5a623",
+                        "surface-variant": "#32353d",
+                        "surface": "#111111",
+                        "success": "#0070f3",
+                        "on-surface": "#e0e2ed",
+                        "on-error": "#690005",
+                        "tertiary-fixed-dim": "#ffb596",
+                        "on-secondary-container": "#d0a6ff",
+                        "surface-dim": "#10131b",
+                        "secondary-fixed": "#efdbff",
+                        "secondary-fixed-dim": "#dbb8ff",
+                        "outline": "#8b90a0",
+                        "on-secondary": "#470083"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "space-unit": "4px",
+                        "container-max": "1440px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Geist"],
+                        "body-md": ["Geist"],
+                        "label-md": ["JetBrains Mono"],
+                        "headline-lg-mobile": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "headline-xl": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "label-sm": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-xl": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #000000;
+            color: #e0e2ed;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased flex h-screen overflow-hidden">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col h-screen overflow-y-auto py-4 bg-surface-container-low dark:bg-surface-container-lowest text-primary dark:text-primary fixed left-0 top-0 w-64 border-r border-border z-40 hide-scrollbar shrink-0">
+<div class="px-6 mb-8 flex items-center space-x-3">
+<img class="w-8 h-8 object-contain" data-alt="A minimalist logo for a tech-focused logistics platform named FreightNXT, featuring sharp geometric lines in primary blue against a dark background, embodying speed and precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOYxstzP8RjC7q9ysiUcjoxiEtDO7wgnOmIDpqDFViNdc2I3tTlUn3OKSGPXjYW9RuO0Gl8yv2LcdQKV3wyNyRazAFGv3XH12rsfxWjIZQd3L0k4pTmUtBKR4IpOOiG1MjTSJeFppbNnlNAjZYHJOMATMAZlFm8Q3MJXzi7NmCl-46VG0Wv4oJyVjOfdjHd9Ty8u7QEg0fr3VNA5kgWJjtkFXniXryF2jcDWJFZpGJglCGBOi3eOKGME6EztpgrigQ4ztmsy_uel4"/>
+<div>
+<h1 class="text-body-lg font-headline-md font-bold text-on-surface">FreightNXT</h1>
+<span class="text-body-sm font-body-sm text-on-surface-variant">(by Axestrack)</span>
+</div>
+</div>
+<div class="px-4 mb-6">
+<button class="w-full bg-primary-container text-on-primary-container font-label-md text-label-md py-2 px-4 rounded hover:bg-primary-fixed-dim transition-colors flex items-center justify-center space-x-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">add</span>
+<span>Create Work Order</span>
+</button>
+</div>
+<ul class="flex-1 space-y-1 mt-2">
+<li>
+<a class="flex items-center space-x-3 text-on-surface-variant hover:text-on-surface px-4 py-2 mx-2 my-1 rounded-lg hover:bg-surface-container-high transition-all text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">calendar_today</span>
+<span>Plan</span>
+</a>
+</li>
+<li>
+<a class="flex items-center space-x-3 bg-primary-container text-on-primary-container font-semibold rounded-lg mx-2 my-1 px-4 py-2 text-label-md font-label-md scale-95 duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assignment</span>
+<span>Logs</span>
+</a>
+</li>
+<li>
+<a class="flex items-center space-x-3 text-on-surface-variant hover:text-on-surface px-4 py-2 mx-2 my-1 rounded-lg hover:bg-surface-container-high transition-all text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">category</span>
+<span>Maintenance Types</span>
+</a>
+</li>
+<li>
+<a class="flex items-center space-x-3 text-on-surface-variant hover:text-on-surface px-4 py-2 mx-2 my-1 rounded-lg hover:bg-surface-container-high transition-all text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">receipt_long</span>
+<span>Bills</span>
+</a>
+</li>
+<li>
+<a class="flex items-center space-x-3 text-on-surface-variant hover:text-on-surface px-4 py-2 mx-2 my-1 rounded-lg hover:bg-surface-container-high transition-all text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings_input_component</span>
+<span>Parts</span>
+</a>
+</li>
+<li>
+<a class="flex items-center space-x-3 text-on-surface-variant hover:text-on-surface px-4 py-2 mx-2 my-1 rounded-lg hover:bg-surface-container-high transition-all text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">priority_high</span>
+<span>Due Maintenance</span>
+</a>
+</li>
+<li>
+<a class="flex items-center space-x-3 text-on-surface-variant hover:text-on-surface px-4 py-2 mx-2 my-1 rounded-lg hover:bg-surface-container-high transition-all text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">fact_check</span>
+<span>Inspection</span>
+</a>
+</li>
+</ul>
+<div class="mt-auto border-t border-border pt-4 px-2">
+<a class="flex items-center space-x-3 text-on-surface-variant hover:text-on-surface px-4 py-2 mx-2 my-1 rounded-lg hover:bg-surface-container-high transition-all text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center space-x-3 text-on-surface-variant hover:text-on-surface px-4 py-2 mx-2 my-1 rounded-lg hover:bg-surface-container-high transition-all text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help</span>
+<span>Support</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-64 flex flex-col min-w-0 bg-background relative overflow-hidden">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center h-16 px-gutter w-full sticky top-0 z-50 bg-surface dark:bg-surface border-b border-border">
+<div class="flex items-center space-x-4">
+<button class="md:hidden text-on-surface-variant">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<span class="text-headline-md font-headline-md font-bold text-primary-container dark:text-primary hidden md:block">AXESTRACK</span>
+</div>
+<div class="flex items-center space-x-6">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="bg-surface-container border border-border rounded pl-9 pr-4 py-1.5 text-body-sm font-body-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container w-64" placeholder="Search..." type="text"/>
+</div>
+<div class="flex items-center space-x-4 text-primary dark:text-primary">
+<button class="text-on-surface-variant hover:bg-surface-container-low transition-colors p-1.5 rounded">
+<span class="material-symbols-outlined">light_mode</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-low transition-colors p-1.5 rounded relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<img alt="User demo Member avatar" class="w-8 h-8 rounded-full border border-border object-cover" data-alt="A high-quality, professional headshot of a software engineer in a dark, tech-oriented office environment. Subtle blue lighting highlights the side of their face, matching a high-end IDE aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2M3w8j26gC98HBEvEtx-4pZW7ZvPS6pqYNtikZCgcVqM6h8fx6x83qLkZnlg6VjeugmGLwwrdlAm7R-Flt7kWjnqPD-QdLZMXTViMNNzq9HwMBJFjtK_EzSwOWlAAoW1ZKj6TWrxowgAKohnctrwUe1Y9OuSxgZ4zIC9uoXs0MYPHaYaI-Wfu4fp9-OU0Ufr3uZU5kvLjFXm3ErjDvrYFeWM2rfQZjtyk0La6H8cSL0OrVyp6OZLj-CaL0HsvS8SwWUKRcUmM8kE"/>
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<div class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
+<!-- Header Section -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+<div>
+<h2 class="text-headline-lg font-headline-lg text-on-surface">Maintenance Logs</h2>
+<p class="text-body-md font-body-md text-on-surface-variant mt-1">Review and manage vehicle and trailer maintenance history.</p>
+</div>
+<div class="bg-surface-container border border-border p-4 rounded-lg flex items-center space-x-4">
+<div class="p-2 bg-surface-container-highest rounded">
+<span class="material-symbols-outlined text-primary-container">account_balance_wallet</span>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Total Amount</p>
+<p class="text-headline-md font-headline-md text-on-surface font-mono">$12,450.00</p>
+</div>
+</div>
+</div>
+<!-- Tabs & Filters -->
+<div class="bg-surface border border-border rounded-lg p-1 flex flex-col md:flex-row justify-between items-center space-y-3 md:space-y-0 w-full overflow-x-auto">
+<div class="flex space-x-1 shrink-0 p-1 bg-surface-container rounded">
+<button class="px-4 py-1.5 text-label-md font-label-md bg-surface-container-highest text-on-surface rounded border border-border shadow-sm">Vehicle</button>
+<button class="px-4 py-1.5 text-label-md font-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest rounded transition-colors">Trailer</button>
+</div>
+<div class="flex space-x-3 items-center min-w-max px-2">
+<select class="bg-surface border border-border text-body-sm font-body-sm text-on-surface rounded py-1.5 pl-3 pr-8 focus:ring-1 focus:ring-primary-container focus:border-primary-container">
+<option>All Statuses</option>
+<option>Completed</option>
+<option>Pending</option>
+</select>
+<select class="bg-surface border border-border text-body-sm font-body-sm text-on-surface rounded py-1.5 pl-3 pr-8 focus:ring-1 focus:ring-primary-container focus:border-primary-container">
+<option>All Carriers</option>
+<option>Carrier A</option>
+<option>Carrier B</option>
+</select>
+<button class="flex items-center space-x-2 text-label-md font-label-md text-on-surface border border-border bg-surface hover:bg-surface-container-low px-3 py-1.5 rounded transition-colors" id="openFilterBtn">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+<span>Advanced</span>
+</button>
+</div>
+</div>
+<!-- Data Table -->
+<div class="bg-surface border border-border rounded-lg overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-border bg-surface-container-lowest">
+<th class="p-4 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider font-medium">Type</th>
+<th class="p-4 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider font-medium">Vehicle No.</th>
+<th class="p-4 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider font-medium">Date</th>
+<th class="p-4 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider font-medium text-right">Mileage</th>
+<th class="p-4 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider font-medium text-right">Amount</th>
+<th class="p-4 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider font-medium">Description</th>
+<th class="p-4 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider font-medium">Bill Ref</th>
+<th class="p-4 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider font-medium text-center">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border font-body-sm text-body-sm">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="p-4">
+<span class="px-2 py-1 bg-surface-container-highest text-on-surface border border-border rounded text-xs">Preventive</span>
+</td>
+<td class="p-4 font-label-md text-primary-container">100</td>
+<td class="p-4 text-on-surface-variant">Oct 12, 2023</td>
+<td class="p-4 text-right font-label-md">120,450</td>
+<td class="p-4 text-right font-label-md text-on-surface">$450.00</td>
+<td class="p-4 text-on-surface truncate max-w-[200px]">Oil change and filter replacement</td>
+<td class="p-4 text-on-surface-variant font-label-md">INV-9021</td>
+<td class="p-4 text-center">
+<button class="text-on-surface-variant hover:text-primary-container opacity-0 group-hover:opacity-100 transition-all">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="p-4">
+<span class="px-2 py-1 bg-surface-container-highest text-on-surface border border-border rounded text-xs">Repair</span>
+</td>
+<td class="p-4 font-label-md text-primary-container">137</td>
+<td class="p-4 text-on-surface-variant">Oct 10, 2023</td>
+<td class="p-4 text-right font-label-md">85,200</td>
+<td class="p-4 text-right font-label-md text-on-surface">$1,200.00</td>
+<td class="p-4 text-on-surface truncate max-w-[200px]">Brake pad replacement front axle</td>
+<td class="p-4 text-on-surface-variant font-label-md">INV-9018</td>
+<td class="p-4 text-center">
+<button class="text-on-surface-variant hover:text-primary-container opacity-0 group-hover:opacity-100 transition-all">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</main>
+<!-- Filter Drawer (Right Side) -->
+<div class="fixed inset-0 bg-black/50 z-[60] hidden opacity-0 transition-opacity duration-300" id="filterDrawerOverlay"></div>
+<div class="fixed top-0 right-0 w-80 h-full bg-surface-container-lowest border-l border-border z-[70] transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl" id="filterDrawer">
+<div class="flex items-center justify-between p-6 border-b border-border">
+<h3 class="text-headline-md font-headline-md text-on-surface">Advanced Filters</h3>
+<button class="text-on-surface-variant hover:text-on-surface p-1 rounded hover:bg-surface-container-high transition-colors" id="closeFilterBtn">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-6 space-y-6">
+<!-- Date Range -->
+<div class="space-y-3">
+<label class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wide text-xs">Date Range</label>
+<div class="grid grid-cols-2 gap-3">
+<input class="bg-surface border border-border rounded px-3 py-2 text-body-sm font-body-sm text-on-surface focus:ring-1 focus:ring-primary-container focus:border-primary-container w-full [color-scheme:dark]" type="date"/>
+<input class="bg-surface border border-border rounded px-3 py-2 text-body-sm font-body-sm text-on-surface focus:ring-1 focus:ring-primary-container focus:border-primary-container w-full [color-scheme:dark]" type="date"/>
+</div>
+</div>
+<!-- Tire Position -->
+<div class="space-y-3">
+<label class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wide text-xs">Tire Position (If Applicable)</label>
+<select class="bg-surface border border-border text-body-sm font-body-sm text-on-surface rounded w-full py-2 pl-3 pr-8 focus:ring-1 focus:ring-primary-container focus:border-primary-container">
+<option>Select Position...</option>
+<option>Front Left (Steer)</option>
+<option>Front Right (Steer)</option>
+<option>Rear Inner Left (Drive)</option>
+<option>Rear Outer Left (Drive)</option>
+</select>
+</div>
+<!-- Amount Range -->
+<div class="space-y-3">
+<label class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wide text-xs">Amount Range</label>
+<div class="flex items-center space-x-2">
+<input class="bg-surface border border-border rounded px-3 py-2 text-body-sm font-body-sm text-on-surface focus:ring-1 focus:ring-primary-container focus:border-primary-container w-full" placeholder="Min" type="number"/>
+<span class="text-on-surface-variant">-</span>
+<input class="bg-surface border border-border rounded px-3 py-2 text-body-sm font-body-sm text-on-surface focus:ring-1 focus:ring-primary-container focus:border-primary-container w-full" placeholder="Max" type="number"/>
+</div>
+</div>
+</div>
+<div class="p-6 border-t border-border bg-surface-container flex space-x-3">
+<button class="flex-1 border border-border text-on-surface bg-surface hover:bg-surface-container-high py-2 rounded text-label-md font-label-md transition-colors">Reset</button>
+<button class="flex-1 bg-primary-container text-on-primary-container hover:bg-primary-fixed-dim py-2 rounded text-label-md font-label-md transition-colors">Apply Filters</button>
+</div>
+</div>
+<script>
+        // Drawer Logic
+        const openBtn = document.getElementById('openFilterBtn');
+        const closeBtn = document.getElementById('closeFilterBtn');
+        const drawer = document.getElementById('filterDrawer');
+        const overlay = document.getElementById('filterDrawerOverlay');
+
+        function toggleDrawer() {
+            const isOpen = !drawer.classList.contains('translate-x-full');
+            
+            if (isOpen) {
+                drawer.classList.add('translate-x-full');
+                overlay.classList.remove('opacity-100');
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                }, 300);
+            } else {
+                overlay.classList.remove('hidden');
+                // Trigger reflow
+                void overlay.offsetWidth;
+                overlay.classList.add('opacity-100');
+                drawer.classList.remove('translate-x-full');
+            }
+        }
+
+        openBtn.addEventListener('click', toggleDrawer);
+        closeBtn.addEventListener('click', toggleDrawer);
+        overlay.addEventListener('click', toggleDrawer);
+    </script>
+</body></html>

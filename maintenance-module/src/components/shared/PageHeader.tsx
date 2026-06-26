@@ -10,11 +10,11 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, subtitle, actions, filters, className }: PageHeaderProps) {
   return (
-    <div className={cn('bg-white border-b border-gray-200', className)}>
+    <div className={cn('border-b', className)} style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
       <div className="px-6 py-4 flex items-center justify-between">
         <div>
-          <h1 className="text-[16px] font-semibold text-gray-900">{title}</h1>
-          {subtitle && <p className="text-[12px] text-gray-500 mt-0.5">{subtitle}</p>}
+          <h1 className="text-[20px] font-semibold" style={{ color: 'var(--text-1)' }}>{title}</h1>
+          {subtitle && <p className="text-[12px] mt-0.5" style={{ color: 'var(--text-3)' }}>{subtitle}</p>}
         </div>
         {actions && <div className="flex items-center gap-2">{actions}</div>}
       </div>

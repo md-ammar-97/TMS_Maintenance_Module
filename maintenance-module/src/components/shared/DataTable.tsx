@@ -28,7 +28,6 @@ export function DataTable<T>({
   onRowClick, selectable, selectedIds = [], onSelectionChange,
 }: DataTableProps<T>) {
   const allSelected = data.length > 0 && data.every(r => selectedIds.includes(getRowId(r)))
-  const someSelected = !allSelected && data.some(r => selectedIds.includes(getRowId(r)))
 
   function toggleAll() {
     if (!onSelectionChange) return
@@ -43,23 +42,17 @@ export function DataTable<T>({
     <div className="flex-1 overflow-auto">
       <table className="w-full min-w-max text-[13px]">
         <thead className="sticky top-0 z-10">
-          <tr className="bg-gray-50 border-b border-gray-200">
+          <tr style={{ background: 'var(--surface-dim)', borderBottom: '1px solid var(--border)' }}>
             {selectable && (
               <th className="w-10 px-4 py-2.5">
-                <Checkbox
-                  checked={allSelected || someSelected}
-                  onCheckedChange={toggleAll}
-                />
+                <Checkbox checked={allSelected} onCheckedChange={toggleAll} />
               </th>
             )}
             {columns.map(col => (
               <th
                 key={col.key}
-                className={cn(
-                  'px-4 py-2.5 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide',
-                  col.width,
-                  col.className
-                )}
+                className={cn('px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wide', col.width, col.className)}
+                style={{ color: 'var(--text-3)' }}
               >
                 {col.header}
               </th>
@@ -71,7 +64,8 @@ export function DataTable<T>({
             <tr>
               <td
                 colSpan={columns.length + (selectable ? 1 : 0)}
-                className="px-4 py-12 text-center text-[13px] text-gray-400"
+                className="px-4 py-12 text-center text-[13px]"
+                style={{ color: 'var(--text-4)' }}
               >
                 {emptyMessage}
               </td>
@@ -84,12 +78,13 @@ export function DataTable<T>({
                 <tr
                   key={id}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
-                  className={cn(
-                    'group border-b border-gray-100 h-12 transition-colors',
-                    isSelected && 'bg-blue-50',
-                    onRowClick && !isSelected && 'hover:bg-gray-50 cursor-pointer',
-                    !onRowClick && !isSelected && 'hover:bg-gray-50',
-                  )}
+                  className={cn('group h-12 transition-colors', onRowClick && 'cursor-pointer')}
+                  style={{
+                    borderBottom: '1px solid var(--border-subtle)',
+                    background: isSelected ? 'rgba(0,112,243,0.08)' : undefined,
+                  }}
+                  onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = 'var(--surface-high)' }}
+                  onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = 'transparent' }}
                 >
                   {selectable && (
                     <td className="w-10 px-4" onClick={e => { e.stopPropagation(); toggleRow(id) }}>
