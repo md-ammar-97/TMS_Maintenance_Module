@@ -1,0 +1,1898 @@
+PROJECT PROBLEM STATEMENT
+Maintenance Module Frontend Prototype for Existing TMS
+
+1. CONTEXT
+
+We already have a working Transportation Management System (TMS). This task is only to build a proper clickable frontend prototype for the Maintenance Module.
+
+The prototype does NOT need a functional backend, database, authentication, real APIs, or server-side persistence. It should be deployable as a Vercel frontend only.
+
+The goal is to create a realistic maintenance module experience where all pages are connected, modals work, dropdowns are populated, tables have hardcoded seed data, and newly created items during the active browser session reflect across related pages.
+
+Ignore any Figma-related references from earlier prompts. The output should be a working frontend prototype, not a Figma file.
+
+2. PRIMARY OBJECTIVE
+
+Build a frontend-only Maintenance Module with the following pages:
+
+1. Plan
+2. Logs
+3. Maintenance Types
+4. Maintenance Bills
+5. Parts
+6. Due Maintenance
+7. Inspection
+
+The prototype should feel like a real TMS module. Users should be able to navigate between pages, open modals, create/edit/delete prototype records, filter/search tables, and see newly created data reflected in related dropdowns and tables during the same browser session.
+
+3. DEPLOYMENT AND TECHNICAL EXPECTATIONS
+
+3.1 Frontend only
+
+- Build as a frontend-only app suitable for Vercel deployment.
+- No backend is required.
+- No real database is required.
+- No authentication is required.
+- No real API integrations are required.
+- No server-side state is required.
+
+3.2 Recommended frontend behavior
+
+Use React/Next.js or any Vercel-compatible frontend stack.
+
+Use session-level state so data persists only while the browser session is open.
+
+Preferred approach:
+
+- Seed hardcoded data on first load.
+- Store working session data in sessionStorage.
+- Read from sessionStorage across pages.
+- When the browser/tab session closes, the data can reset on the next fresh session.
+
+Important:
+
+- Every user opening the app for the first time should see hardcoded sample data.
+- If a user creates a new maintenance type, plan, vendor, part, log, bill, or inspection during the same session, it should reflect across relevant pages.
+- Data does not need to remain permanently after the browser session ends.
+
+3.3 Routing
+
+Create a left navigation/sidebar or top navigation menu with links to all pages:
+
+- /maintenance/plan
+- /maintenance/logs
+- /maintenance/types
+- /maintenance/bills
+- /maintenance/parts
+- /maintenance/due-maintenance
+- /maintenance/inspection
+
+Exact route names can vary, but all pages must be accessible and linked.
+
+3.4 UI style
+
+- Keep the UI clean, enterprise SaaS-style, similar to a TMS admin dashboard.
+- Use tables, filter bars, primary/secondary buttons, dropdowns, date pickers, toggles, drawers, modals, tabs, and row action menus.
+- Primary buttons should be visually prominent.
+- Secondary buttons should be lighter.
+- Row actions should usually be under a three-dot menu.
+- The prototype should prioritize functional flow and clickable behavior over pixel-perfect design.
+
+4. GLOBAL DATA AND SESSION STATE
+
+Create shared frontend state for the following entities:
+
+1. Maintenance Types
+2. Maintenance Plans
+3. Vendors
+4. Vehicles
+5. Trailers
+6. Carriers
+7. Parts
+8. Maintenance Logs
+9. Maintenance Bills
+10. Due Maintenance Records
+11. Inspection Records
+
+All pages should read from and update the same shared session data.
+
+4.1 Required seeded maintenance types
+
+Seed the Maintenance Types page with:
+
+1. Oil Change
+   Description: Every 30,000-35,000 Miles
+
+2. Truck Tires
+   Description: Steers - Change Every 100,000 Miles
+
+3. Engine work
+   Description: Blank
+
+4. Trailer Work
+   Description: Blank
+
+5. Trailer Tires
+   Description: Blank
+
+6. Reefer Work
+   Description: Blank
+
+7. Truck Work
+   Description: Blank
+
+These types should populate maintenance type dropdowns across:
+
+- Plan create/edit modal
+- Logs create/edit modal
+- Bills create/edit modal
+- Due Maintenance advanced filters
+- Any other maintenance type selector
+
+If a new maintenance type is created from the Maintenance Types page, it must immediately appear in all maintenance type dropdowns across the app during the same session.
+
+4.2 Required seeded carriers
+
+Seed carriers:
+
+- YOLO TRANSPORT LLC
+- YOUNGS FREIGHTWAYS INC
+- 2G Express LLC
+- 2H Brothers Trucking Service Inc
+- 3 Tigers Transport Inc
+- 3D Carrier Inc
+- 4B States Carrier Inc
+- A & E Luna Tracking LLC
+- A & S Trucking
+- A&J TRUCKLINE INC
+- A&R Garcia Trucking, LLC.
+- AGAM HAULER INC
+- AGS Transport Inc
+- AIM TRANSPORT INC
+- AIRBOURNE LOGISTICS INC
+- YAJAT INC
+- Western Enterprises
+- Worldwide Express
+- ZEEZ TRANSPORTATION
+- Zee Trucking Inc
+- Zero 1 Transport Inc
+
+4.3 Required seeded vehicles
+
+Seed vehicles:
+
+- 100
+- 137
+- 139
+- 143
+- 144
+- 160
+- 161
+- 162
+- 163
+- 164
+- 107
+- 109
+
+Include sample carrier and terminal mappings.
+
+Example fields:
+
+- Vehicle number
+- Carrier
+- Terminal
+- Current mileage
+- Status
+
+4.4 Required seeded trailers
+
+Seed trailers:
+
+- 3559
+- 53100
+- 53101
+- 53102
+- 53103
+- 5330
+- 5331
+- 5333
+- 5334
+- 5335
+
+Include sample carrier and terminal mappings.
+
+4.5 Required seeded vendors
+
+Seed vendors:
+
+- BVD
+- Comdata
+- QuikQ
+- Pre Pass
+- PilotFlyingJ
+- Best Pass
+- FleetOne
+- EFS
+- Downs Energy/CFN
+- TCS
+- I-Pass
+- Youngs Freightways INC
+
+If a vendor is created from a vendor modal, it should appear in vendor dropdowns on Logs and Maintenance Bills during the same session.
+
+4.6 Required seeded maintenance plans
+
+Seed plans:
+
+1. 30000 miles
+   Type: Oil Change
+   Interval Type: Mileage
+   Interval: 30000
+   Status: True
+   Description: Oil change after every 30,000 miles
+
+2. Regular Maintenance
+   Type: Truck Work
+   Interval Type: Months
+   Interval: 3
+   Status: True
+   Description: Quarterly truck maintenance check
+
+3. BIT INSPECTION
+   Type: Inspection
+   Interval Type: Months
+   Interval: 12
+   Status: True
+   Description: Annual inspection compliance plan
+
+New plans created anywhere in the app should appear on the Plan page and in Maintenance Plan dropdowns on Logs, Bills, and Due Maintenance during the same session.
+
+4.7 Required seeded parts
+
+Seed parts:
+
+1. Oil Filter
+   Description: Standard oil filter for truck maintenance
+
+2. Air Filter
+   Description: Engine air filter replacement
+
+3. Brake Pad Set
+   Description: Front axle brake pad set
+
+4. Reefer Belt
+   Description: Replacement belt for reefer unit
+
+5. Trailer Tire
+   Description: Standard trailer tire replacement item
+
+Parts should populate a Part dropdown in Maintenance Bills when Maintenance Log Type is selected as Part.
+
+5. PAGE 1: PLAN
+
+5.1 Page title
+
+Page title: Plan
+
+5.2 Header actions
+
+Add a primary button:
+
+- + Create New Maintenance Plan
+
+Clicking this opens a popup/modal.
+
+Add an export option:
+
+- Export table in Excel form
+
+The export can generate a CSV/XLSX-like download from current table data. Since this is a frontend prototype, CSV export is acceptable if simpler.
+
+5.3 Create/Edit Maintenance Plan popup
+
+Modal title for create:
+
+- Create new maintenance plan
+
+Modal title for edit:
+
+- Edit maintenance plan
+
+Fields:
+
+1. Name
+   - Text input
+   - Required
+
+2. Maintenance Type
+   - Dropdown
+   - Required
+   - Options should come from shared Maintenance Types
+   - Initial seeded examples:
+     - Oil Change
+     - Truck Tire
+     - Trailer Tire
+     - Engine Work
+     - Trailer Work
+     - Truck Work
+     - Reefer Work
+
+3. Description
+   - Text input or text area
+
+4. Interval Type
+   - Dropdown
+   - Required
+   - Options:
+     - Days
+     - Months
+     - Mileage
+
+5. Interval
+   - Number input only
+   - Required
+   - Must accept numbers only
+
+6. Validate Upcoming Maintenance At Dispatch
+   - Switch component
+   - Boolean
+
+7. Validate Due Maintenance At Dispatch
+   - Switch component
+   - Boolean
+
+8. Status
+   - Switch component
+   - Boolean
+   - Default: On/True
+
+Footer buttons:
+
+- Save
+- Cancel
+
+Save behavior:
+
+- Validate required fields.
+- Create or update the maintenance plan in session state.
+- Newly created plans must appear in:
+  - Plan table
+  - Logs maintenance plan dropdown
+  - Bills maintenance plan dropdown
+  - Due Maintenance filters
+
+5.4 Plan filter bar
+
+Create a filter/search bar with:
+
+1. General search
+   - Search by Name or Description
+
+2. Name search
+   - Search by Name
+
+3. Maintenance Type dropdown
+   - Options:
+     - All
+     - OilChange
+     - TuneUp
+     - Service
+     - Brakes
+     - TireReplacement
+     - TireRepair
+     - Repair
+     - Engine
+     - TrailerService
+     - Towing
+     - Wash
+     - Inspection
+     - Misc
+   - Also include any maintenance types created during session if possible.
+
+4. Interval Type dropdown
+   - Options:
+     - All
+     - Days
+     - Months
+     - Mileage
+
+5. Status dropdown
+   - Options:
+     - All
+     - False
+     - True
+
+Add a clear filters button.
+
+5.5 Plan table
+
+Columns:
+
+1. Actions
+2. Name
+3. Maintenance Type
+4. Interval Type
+5. Interval
+6. Status
+7. Description
+8. Total OverDue
+
+Hardcode at least 3 rows from seeded maintenance plans.
+
+5.6 Row action menu
+
+Each row should have a three-dot action menu with:
+
+1. Edit
+   - Opens edit maintenance plan modal with row data prefilled.
+
+2. Truck Maintenance Details
+   - Opens a popup.
+
+5.7 Truck Maintenance Details popup
+
+Popup title:
+
+- Use the selected plan name as the title.
+
+Example:
+
+- 30000 miles
+- Regular Maintenance
+
+Popup contains a table with columns:
+
+1. Vehicle Number
+2. Terminal
+3. Carrier
+4. Last Service Date
+5. Due Date/Mileage
+
+Popup requirements:
+
+- Include hardcoded sample vehicle maintenance rows.
+- Allow user to select how many rows to view in popup.
+- Include close button.
+
+6. PAGE 2: LOGS
+
+6.1 Page title
+
+Page title: Logs
+
+6.2 Header actions
+
+Top right elements:
+
+1. Total Amount
+   - Display total amount of visible or all maintenance logs.
+   - Example: Total Amount: $12,450
+
+2. PullRay Integration Logs
+   - Secondary button
+   - Can open a simple placeholder modal or toast saying integration logs are not connected in prototype.
+
+3. + Create new maintenance log
+   - Primary button
+   - Opens create maintenance log modal.
+
+6.3 Main tabs
+
+Tabs:
+
+1. Vehicle
+2. Trailer
+
+Vehicle tab is active by default.
+
+The table and filters should switch context between vehicle logs and trailer logs.
+
+6.4 Logs filter bar
+
+Fields:
+
+1. Search
+   - Text input with search icon
+   - Searches across maintenance type, plan name, vehicle/trailer number, vendor, description, and bill ref number.
+
+2. Log Status
+   - Dropdown options:
+     - All
+     - Mapped
+     - UnMapped
+
+3. Maintenance Type
+   - Dropdown options from shared Maintenance Types
+   - Include search inside dropdown if possible.
+
+4. Maintenance Plan
+   - Dropdown options from shared Maintenance Plans
+   - Seeded options:
+     - 30000 miles
+     - Regular Maintenance
+     - BIT INSPECTION
+
+5. Carrier
+   - Dropdown options from shared Carriers
+   - Must include:
+     - YOLO TRANSPORT LLC
+     - YOUNGS FREIGHTWAYS INC
+
+6. Vehicle Number or Trailer Number
+   - On Vehicle tab: Vehicle Number dropdown
+   - On Trailer tab: Trailer Number dropdown
+   - Use shared vehicle/trailer data.
+
+7. Clear Filters
+   - Icon button
+
+8. Advanced Filters
+   - Funnel icon
+   - Opens right-side drawer.
+
+6.5 Logs advanced filters drawer
+
+Drawer title: Filters
+
+Fields:
+
+1. Tire Position
+   - Dropdown options:
+     - All
+     - LFI Left Front Inside
+     - LFO Left Front Outside
+     - RFI Right Front Inside
+     - RFO Right Front Outside
+     - LRI Left Rear Inside
+     - LRO Left Rear Outside
+     - RRI Right Rear Inside
+     - RRO Right Rear Outside
+     - RS Right Steer
+     - LS Left Steer
+
+2. Min Mileage
+   - Text input or number input
+
+3. Max Mileage
+   - Text input or number input
+
+4. Service date
+   - Date picker
+
+5. Min Amount
+   - Number input
+
+6. Max Amount
+   - Number input
+
+7. Description
+   - Text input
+
+Drawer footer buttons:
+
+- Clear Filters
+- Apply Filters
+
+6.6 Logs table
+
+Columns:
+
+1. Actions
+2. Maintenance Type
+3. External maintenance type
+4. Plan Name
+5. Tire Position
+6. Vehicle number or Trailer number
+7. Service date
+8. Mileage
+9. Amount
+10. Description
+11. Created By
+12. Bill Ref Number
+13. Currency
+14. GST
+15. HST
+16. QST
+
+Requirements:
+
+- Include at least 3 hardcoded rows for Vehicle logs.
+- Include at least 3 hardcoded rows for Trailer logs.
+- Table should support horizontal scroll if needed.
+- Include rows per page dropdown.
+- Include pagination footer.
+- Include export/download icon.
+- Include column customization icon.
+
+6.7 Logs row actions
+
+Each row action menu should include:
+
+1. Edit
+   - Opens maintenance log modal with row data prefilled.
+
+2. Delete
+   - Removes row from session state.
+
+6.8 Column customization popover
+
+Open from table toolbar.
+
+Checkbox list, all checked by default:
+
+- Actions
+- Maintenance Type
+- External maintenance type
+- Plan Name
+- Tire Position
+- Vehicle number / Trailer number
+- Service date
+- Mileage
+- Amount
+- Description
+- Created By
+- Bill Ref Number
+- Currency
+- GST
+- HST
+- QST
+
+Unchecked columns should hide from table during current session.
+
+6.9 Create/Edit Maintenance Log modal
+
+Modal title:
+
+- Create new maintenance log
+- Edit maintenance log
+
+Top right toggle:
+
+- Vehicle
+- Trailer
+
+Vehicle is active by default unless opened from a trailer context or due maintenance trailer row.
+
+6.9.1 Vehicle tab fields
+
+1. Maintenance Type
+   - Required
+   - Dropdown from shared Maintenance Types
+   - Placeholder: Select Maintenance Type
+
+2. Tire Position
+   - Dropdown options:
+     - Select Tire Position
+     - LRI Left Rear Inside
+     - LRO Left Rear Outside
+     - RRI Right Rear Inside
+     - RRO Right Rear Outside
+     - LFI Left Front Inside
+     - LFO Left Front Outside
+     - RFI Right Front Inside
+     - RFO Right Front Outside
+     - RS Right Steer
+     - LS Left Steer
+
+3. Maintenance Plan
+   - Dropdown from shared Maintenance Plans
+   - Include search behavior if possible.
+
+4. + Create New under Maintenance Plan
+   - Opens Create new maintenance plan modal.
+
+5. Vehicle
+   - Required
+   - Dropdown options from shared Vehicles
+   - Must include:
+     - 100
+     - 137
+     - 139
+     - 143
+     - 144
+     - 160
+     - 161
+     - 162
+     - 163
+
+6. Vendor
+   - Dropdown from shared Vendors
+   - Must include:
+     - BVD
+     - Comdata
+     - QuikQ
+     - Pre Pass
+     - PilotFlyingJ
+     - Best Pass
+     - FleetOne
+     - EFS
+     - Downs Energy/CFN
+     - TCS
+     - I-Pass
+     - Youngs Freightways INC
+
+7. + Create New under Vendor
+   - Opens Create new vendor modal.
+
+8. Mileage
+   - Required
+   - Text or number input
+   - Default value: 0
+
+9. Service date
+   - Required
+   - Date picker
+   - Default: current date
+
+10. Currency
+   - Dropdown options:
+     - USD
+     - CAD
+   - Default: USD
+
+11. Amount
+   - Required
+   - Number input
+
+12. Description
+   - Text area
+
+Footer buttons:
+
+- Cancel
+- Save
+
+6.9.2 Trailer tab fields
+
+Same as Vehicle tab except:
+
+- Replace Vehicle dropdown with Trailer dropdown.
+- Trailer dropdown options from shared Trailers:
+  - 3559
+  - 53100
+  - 53101
+  - 53102
+  - 53103
+- Mileage can be hidden or optional for trailer logs depending on implementation. In the extracted UI, trailer logs do not require mileage.
+
+6.10 Create new vendor modal
+
+This modal opens from Vendor + Create New in Logs or Bills.
+
+Modal title:
+
+- Create new vendor
+
+General Information section:
+
+1. Name
+   - Required
+   - Text input
+
+2. Vendor ID
+   - Text input
+
+3. Address
+   - Text input
+   - Placeholder: Please enter 1 or more characters
+
+4. Address2
+   - Text input
+
+5. City
+   - Text input
+
+6. State
+   - Text input
+
+7. Zip code
+   - Text input
+
+8. Phone
+   - Text input
+
+9. Fax
+   - Text input
+
+10. Email
+   - Text input
+
+11. Status
+   - Toggle switch
+   - Default: ON
+
+Accounting section:
+
+1. Vendor Id
+   - Text input
+
+2. Class Id
+   - Dropdown
+   - Option: Select
+
+3. Tax Type
+   - Dropdown options:
+     - Select
+     - Not A 1099 Vendor
+     - Dividend
+     - Interest
+     - Miscellaneous
+     - Nonemployee Compensation
+
+4. 1099 Box
+   - Dropdown
+   - Option: Select
+
+Footer buttons:
+
+- Cancel
+- Save
+
+Save behavior:
+
+- Add vendor to shared Vendors.
+- New vendor appears in vendor dropdowns in Logs and Bills.
+
+7. PAGE 3: MAINTENANCE TYPES
+
+7.1 Page title
+
+Page title: Maintenance types
+
+7.2 Header action
+
+Top right primary button:
+
+- + Create new maintenance type
+
+7.3 Filter bar
+
+Fields:
+
+1. Search
+   - General search
+
+2. Name
+   - Filter by name
+
+3. Description
+   - Filter by description
+
+4. Search button
+   - Blue square with search icon
+
+5. Clear button
+   - White square with X icon
+
+6. Filter icon
+   - Funnel icon
+
+7.4 Table columns
+
+1. Actions
+2. Name
+3. Description
+
+Name column should include a two-letter avatar/initial icon based on the maintenance type name.
+
+Example:
+
+- OC for Oil Change
+- TT for Truck Tires
+- EW for Engine work
+
+7.5 Seed table data
+
+Rows:
+
+1. Oil Change | Every 30,000-35,000 Miles
+2. Truck Tires | Steers - Change Every 100,000 Miles
+3. Engine work | Blank
+4. Trailer Work | Blank
+5. Trailer Tires | Blank
+6. Reefer Work | Blank
+7. Truck Work | Blank
+
+7.6 Row actions
+
+Each row three-dot action menu:
+
+1. Edit
+   - Opens edit maintenance type modal with row data prefilled.
+
+2. Delete
+   - Removes the maintenance type from session state.
+   - Also removes/hides it from future dropdown options during the same session.
+
+7.7 Create maintenance type modal
+
+Modal title:
+
+- Create new maintenance type
+
+Fields:
+
+1. Name
+   - Text input
+   - Required
+
+2. Description
+   - Text input
+
+Footer buttons:
+
+- Cancel
+- Save
+
+Save behavior:
+
+- Add new type to shared Maintenance Types.
+- New type immediately appears in:
+  - Plan modal Maintenance Type dropdown
+  - Logs modal Maintenance Type dropdown
+  - Bills modal Maintenance Type dropdown
+  - Logs filters
+  - Bills log item Maintenance Type dropdown
+  - Due Maintenance filters
+
+7.8 Edit maintenance type modal
+
+Modal title:
+
+- Edit maintenance type
+
+Fields:
+
+1. Name
+   - Pre-populated
+
+2. Description
+   - Pre-populated
+
+Footer buttons:
+
+- Cancel
+- Save
+
+Save behavior:
+
+- Update shared Maintenance Types.
+- Updated name should reflect across all dropdowns and tables during session.
+
+8. PAGE 4: MAINTENANCE BILLS
+
+8.1 Page title
+
+Page title: Maintenance bills
+
+8.2 Header actions
+
+Top right buttons:
+
+1. PullRay Integration Logs
+   - Secondary button
+   - Can show placeholder modal/toast in prototype.
+
+2. + Create new maintenance bill
+   - Primary button
+   - Opens create bill modal.
+
+8.3 Main tabs
+
+Tabs:
+
+1. Vehicle
+2. Trailer
+
+Vehicle active by default.
+
+8.4 Filter bar
+
+Fields:
+
+1. Bill Ref Number
+   - Text input with search icon
+
+2. Carrier
+   - Dropdown from shared Carriers
+   - Must include:
+     - YOLO TRANSPORT LLC
+     - YOUNGS FREIGHTWAYS INC
+
+3. Vehicle Number or Trailer Number
+   - On Vehicle tab: Vehicle Number dropdown
+   - On Trailer tab: Trailer Number dropdown
+
+4. Bill date
+   - Date range picker
+   - Presets:
+     - Today
+     - Yesterday
+     - Last 7 Days
+     - Last 30 Days
+     - This Month
+     - Last Month
+     - Custom Range
+   - Buttons:
+     - Apply
+     - Clear
+
+5. Clear Filters
+   - Icon button
+
+6. Advanced Filters
+   - Funnel icon
+
+8.5 Bills table columns
+
+Columns:
+
+1. Bill Ref Number
+2. Payment Status
+3. Vendor name
+4. Carrier
+5. Vehicle number or Trailer number
+6. Bill date
+7. Total Amount
+8. Work completed date
+9. Mileage
+10. Location
+
+Requirements:
+
+- Seed at least 3 vehicle bill rows.
+- Seed at least 3 trailer bill rows.
+- Include export/download icon.
+- Include column customization icon.
+- Include rows per page dropdown and pagination.
+
+8.6 Column customization options
+
+Checkbox options:
+
+- Bill Ref Number
+- Payment Status
+- Vendor name
+- Carrier
+- Trailer number
+- Vehicle number
+- Bill date
+- Total Amount
+- Work completed date
+- Mileage
+- Location
+
+8.7 Create/Edit Maintenance Bill modal
+
+Modal title:
+
+- Create new maintenance bill
+- Edit maintenance bill
+
+Top right toggle:
+
+- Vehicle
+- Trailer
+
+8.7.1 Vehicle tab fields
+
+1. Bill Ref Number
+   - Required
+   - Text input
+
+2. Vendor
+   - Required
+   - Dropdown from shared Vendors
+
+3. + Create New under Vendor
+   - Opens Create new vendor modal
+
+4. Vehicle
+   - Required
+   - Dropdown from shared Vehicles
+   - Options should include:
+     - 100
+     - 137
+     - 139
+     - 143
+     - 144
+
+5. Bill date
+   - Required
+   - Date picker
+   - Default: current date
+
+6. Currency
+   - Dropdown options:
+     - USD
+     - CAD
+   - Default: USD
+
+7. Total Amount
+   - Read-only/calculated
+   - Sum of all maintenance log item amounts in the dynamic Maintenance Log section
+
+8. Payment Status
+   - Required
+   - Dropdown options:
+     - Select Payment Status
+     - Pending
+     - Paid
+
+9. Work completed date
+   - Date picker
+
+10. Mileage
+   - Required for Vehicle bills
+   - Text or number input
+
+11. Location
+   - Text input
+   - Include a target/location pin icon if possible
+
+12. Payment Method
+   - Dropdown options:
+     - Select Payment Method
+     - EFS
+     - ComCheck
+     - ACH
+     - Cash
+     - Card
+
+13. Description
+   - Text area
+
+8.7.2 Trailer tab fields
+
+Same as Vehicle tab except:
+
+- Replace Vehicle dropdown with Trailer dropdown.
+- Trailer dropdown options:
+  - 3559
+  - 53100
+  - 53101
+  - 53102
+  - 53103
+- Remove/hide Mileage field on Trailer tab.
+
+8.8 Dynamic Maintenance Log section inside Bill modal
+
+Section title:
+
+- Maintenance Log
+
+Add a + button that adds a new maintenance log row/block.
+
+Each block should contain:
+
+1. Maintenance Log Type
+   - Required
+   - Dropdown options:
+     - Service
+     - Part
+
+2. Maintenance Type
+   - Required when Maintenance Log Type = Service
+   - Dropdown from shared Maintenance Types
+   - Options must include seeded types and newly created types
+
+3. + Create New under Maintenance Type
+   - Opens Create new maintenance type modal
+
+4. Part
+   - Required when Maintenance Log Type = Part
+   - Dropdown from shared Parts
+   - This field should show only when the selected log type is Part
+
+5. Maintenance Plan
+   - Dropdown from shared Maintenance Plans
+
+6. + Create New under Maintenance Plan
+   - Opens Create new maintenance plan modal
+
+7. Amount
+   - Required
+   - Number input
+
+8. Description
+   - Text area
+
+9. Remove
+   - Removes that block
+
+Total Amount behavior:
+
+- Total Amount should automatically update as the sum of all dynamic log item amounts.
+
+Save behavior:
+
+- Save the maintenance bill in session state.
+- Also create linked maintenance log rows in the Logs page for each Service/Part item if possible.
+- Linked logs should include the bill ref number.
+- New bill should appear in the Maintenance Bills table immediately.
+
+9. PAGE 5: PARTS
+
+9.1 Page title
+
+Page title: Parts
+
+9.2 Header actions
+
+Top right:
+
+1. + Create new part
+   - Primary button
+   - Opens create new part modal
+
+2. Three-dot action menu
+   - Option: Export to excel
+
+9.3 Filter bar
+
+Fields:
+
+1. Search
+   - Text input
+   - Has blue search icon button
+
+2. Name
+   - Text input
+   - Has blue search icon button
+
+3. Description
+   - Text input
+   - Has blue search icon button
+
+4. Clear icon
+   - Clears all filters
+
+9.4 Table toolbar
+
+Right side toolbar:
+
+1. Show/hide columns
+   - Sliders/settings icon
+   - Opens right-side drawer
+
+2. Export to excel
+   - Download icon
+
+3. Filter
+   - Funnel icon
+
+9.5 Table columns
+
+1. Name
+2. Description
+
+Seed at least 5 rows using seeded parts listed in this file.
+
+9.6 Create new part modal
+
+This modal may have no distinct title bar if preferred, but include clear fields.
+
+Fields:
+
+1. Name
+   - Text input
+   - Required
+
+2. Description
+   - Text area
+
+Footer buttons:
+
+- Cancel
+- Save
+
+Save behavior:
+
+- Add part to shared Parts.
+- Newly created part should appear in:
+  - Parts table
+  - Maintenance Bills modal when Maintenance Log Type = Part
+
+9.7 Show/hide columns drawer
+
+Drawer content:
+
+Checkboxes checked by default:
+
+- Name
+- Description
+
+Footer buttons:
+
+- Clear Filters
+- Apply Filters
+
+10. PAGE 6: DUE MAINTENANCE
+
+10.1 Page title
+
+Page title: Due Maintenance
+
+10.2 Filter bar
+
+Fields:
+
+1. Carrier
+   - Dropdown from shared Carriers
+   - Must include:
+     - YOLO TRANSPORT LLC
+     - YOUNGS FREIGHTWAYS INC
+
+2. Vehicle number
+   - Dropdown from shared Vehicles
+   - Must include:
+     - 100
+     - 137
+     - 139
+     - 143
+     - 144
+
+3. Trailer number
+   - Dropdown from shared Trailers
+   - Must include:
+     - 3559
+     - 53100
+     - 53101
+     - 53102
+     - 53103
+
+4. Service date
+   - Date range picker
+   - Presets:
+     - Today
+     - Yesterday
+     - Last 7 Days
+     - Last 30 Days
+     - This Month
+     - Last Month
+     - Custom Range
+   - Buttons:
+     - Apply
+     - Clear
+
+5. Clear Filters
+   - Icon button
+
+6. Advanced Filters
+   - Funnel icon
+   - Opens right-side drawer
+
+10.3 Dashboard tabs
+
+Tabs:
+
+1. By Mileage
+2. By Date
+
+By Mileage active by default.
+
+10.4 Due Maintenance table columns
+
+1. Actions
+2. Plan Name
+3. Vehicle Type
+4. Number
+5. Last Service Date
+6. Last Service Mileage
+7. Current mileage
+8. Due In
+
+Requirements:
+
+- Include hardcoded due maintenance rows for both vehicles and trailers.
+- Due In values should show visually distinct statuses if possible:
+  - Green for not urgent
+  - Yellow/orange for upcoming
+  - Red for overdue
+
+10.5 Row action menu
+
+Each row action menu includes:
+
+1. Create Log
+   - Opens the Create new maintenance log modal.
+   - Modal should be prefilled based on selected due maintenance row:
+     - Vehicle or Trailer tab selected automatically
+     - Vehicle/trailer number prefilled
+     - Maintenance plan prefilled
+     - Maintenance type prefilled from plan if available
+
+Save behavior from Create Log:
+
+- Add a log to Logs table.
+- Update the selected due maintenance record for the current session:
+  - Last Service Date becomes selected service date
+  - Last Service Mileage updates if mileage is provided
+  - Due In recalculates or changes to a non-overdue sample value
+
+10.6 Advanced filters drawer
+
+Drawer title: Filters
+
+Fields:
+
+1. Maintenance Type
+   - Dropdown options:
+     - All
+     - All shared Maintenance Types
+
+2. Maintenance Plan
+   - Dropdown from shared Maintenance Plans
+   - Must include:
+     - 30000 miles
+     - Regular Maintenance
+     - BIT INSPECTION
+
+Footer buttons:
+
+- Clear Filters
+- Apply Filters
+
+10.7 Table toolbar
+
+Include show/hide columns icon.
+
+11. PAGE 7: INSPECTION
+
+11.1 Page title
+
+Page title: Inspection Compliance
+
+11.2 Main tabs
+
+Tabs:
+
+1. Vehicle
+2. Trailer
+
+Vehicle active by default.
+
+11.3 Layout
+
+Create a two-column layout:
+
+Left side:
+
+- Unit selection sidebar
+
+Right side:
+
+- Selected unit inspection details
+
+11.4 Left sidebar fields
+
+1. Unit Number
+   - Text input with search icon button
+
+2. Select Carrier
+   - Dropdown with search bar
+   - Include carriers:
+     - 2G Express LLC
+     - 2H Brothers Trucking Service Inc
+     - 3 Tigers Transport Inc
+     - 3D Carrier Inc
+     - 4B States Carrier Inc
+     - A & E Luna Tracking LLC
+     - A & S Trucking
+     - A&J TRUCKLINE INC
+     - A&R Garcia Trucking, LLC.
+     - AGAM HAULER INC
+     - AGS Transport Inc
+     - AIM TRANSPORT INC
+     - AIRBOURNE LOGISTICS INC
+     - YOLO TRANSPORT LLC
+     - YOUNGS FREIGHTWAYS INC
+
+3. Unit list table
+
+Columns:
+
+- Unit Number
+- Carrier
+
+Vehicle tab units should show vehicle numbers.
+Trailer tab units should show trailer numbers.
+
+Unit numbers should be clickable links. Clicking a unit updates the right-side content.
+
+4. Pagination
+
+Include rows per page dropdown and page numbers.
+
+11.5 Right content header
+
+Header title should display selected unit number.
+
+Example:
+
+- 100
+- 5333
+
+Top right button:
+
+- On Vehicle tab: + Create new truck inspection
+- On Trailer tab: + Create new trailer inspection
+
+Clicking opens full-page create inspection view, not a modal.
+
+11.6 Annual report download section
+
+Fields:
+
+1. Year dropdown
+   - Options:
+     - 2026
+     - 2025
+     - 2024
+     - 2023
+     - 2022
+     - 2021
+
+2. Download button
+   - For prototype, this can open a mock PDF view, new tab, or static printable page.
+   - It does not need to generate a real official PDF.
+
+11.7 Inspection records table
+
+Columns:
+
+1. Actions
+2. Inspection date
+3. Inspection by
+4. Mileage
+
+Seed at least 2 vehicle inspection rows and 2 trailer inspection rows.
+
+11.8 Create new inspection full page
+
+Page title:
+
+- Create new inspection
+
+Top right buttons:
+
+- Back to list
+- Save
+
+Top form fields:
+
+1. Vehicle entity type
+   - Dropdown
+   - Can be prefilled based on Vehicle/Trailer tab
+
+2. Carrier
+   - Required
+   - Dropdown from shared Carriers
+   - Include:
+     - YAJAT INC
+     - YOLO TRANSPORT LLC
+     - YOUNGS FREIGHTWAYS INC
+     - Western Enterprises
+     - Worldwide Express
+     - ZEEZ TRANSPORTATION
+     - Zee Trucking Inc
+     - Zero 1 Transport Inc
+
+3. Vehicle or Trailer
+   - Required
+   - Vehicle options:
+     - 143
+     - 107
+     - 109
+     - 162
+     - 164
+   - Trailer options:
+     - 5333
+     - 5330
+     - 5331
+     - 5334
+     - 5335
+
+4. Mileage
+   - Required for Vehicle inspections
+   - Hidden for Trailer inspections
+
+5. Inspection date
+   - Required
+   - Date picker
+   - Default: current date
+
+6. Inspection by
+   - Required
+   - Dropdown
+   - Seed options:
+     - John Miller
+     - Sarah Lee
+     - David Brown
+     - Mike Johnson
+
+11.9 Inspection item section
+
+Section header:
+
+- Inspection item
+
+Include:
+
+1. Mark all OK checkbox/action
+   - Label: Mark all OK as X
+   - When clicked, mark all inspection items as OK or checked for prototype behavior.
+
+2. Legend
+   - Green circle = Ok
+   - Red square = Def
+
+3. Inspection item grid
+   - Vehicle inspections should show items 1 through 40.
+   - Trailer inspections should show items 1 through 21.
+
+Each item should have:
+
+- Item number
+- Description
+- Three-way control:
+  - NA
+  - OK/checkmark
+  - Def/X
+
+11.10 Vehicle inspection items
+
+Use these exact vehicle inspection items:
+
+1. Fire extinguisher and reflective warning devices
+2. Horn, defroster, gauges, odometer, and speedometer
+3. Mirrors and supports
+4. Windshield wipers, window cracks
+5. All lights, signals, reflectors, mudflaps
+6. Electrical wiring - condition and protection
+7. Batteries - water level, terminals, and cables
+8. Warning devices - air, oil, temperature, anti-skid, and/or vacuum *
+9. Radiator and water hoses - coolant level, condition, and/or leaks
+10. Belts - compressor, fan, water pump, and/or alternator *
+11. Air hoses and tubing leaks, condition, and/or protection *
+12. Fuel system - tank, hoses, tubing, and/or pump; leaks
+13. Exhaust system, manifolds, piping, muffler, leaks and/or condition
+14. Engine - mounting, excessive grease and/or oil
+15. Clutch adjustment - free play
+16. Air filter, throttle linkage
+17. Starting and charging system
+18. Tractor protection valve - NA *
+19. Hydraulic brake system - adjustment, components, and/or condition *
+20. Hydraulic master cylinder - level, leaks, and/or condition *
+21. Hoses and tubing - condition and protection *
+22. Air brake system - adjustment, components, and/or condition *
+23. 1 minute air or vacuum loss test *
+24. Air compressor governor cut-in and cut-out pressures (85-130) *
+25. Primary air tank - drain and test check valve *
+26. Other air tank - drain and check for contamination; securement *
+27. Tires - tread depth, inflation, and condition *
+28. Housing system - studs - cracks, looseness, and/or condition *
+29. Parking brake - able to hold the vehicle *
+30. Emergency stopping system - labeled and operative *
+31. Brakes release after complete loss of service air *
+32. Steering system - adjustment, components, and/or condition
+33. Steering arms, drag links, and/or tie rod ends
+34. Connecting devices - fifth wheel, pin(s), hitch, drawbar, eye and/or safety devices
+35. Suspension system - springs, shackles, u-bolts, and/or torque rods *
+36. Frame and cross members - cracks and/or condition
+37. Drive shaft, universal joints, and/or guards
+38. Transmission and differential - mounting, leaks, and/or condition
+39. Wheel seals - leaks and/or condition *
+40. Under carriage - clean and secure
+
+11.11 Trailer inspection items
+
+Use these exact trailer inspection items:
+
+1. All lights, signals, reflectors
+2. Mudflaps
+3. Air brake system *
+4. Air leaks - dump system
+5. Frame, subframe, and body - cracks
+6. Brake adjustment *
+7. Brake system, drums, and components - condition *
+8. Suspension system - springs, shackles, u-bolts, and/or torque rods *
+9. Connecting device - drawbar, drawbar, eye and/or safety devices *
+10. Fifth wheel on pull trailer *
+11. Air hoses and tubing - leaks, condition, and/or protection *
+12. Tires - tread depth, inflation, and condition *
+13. Wheels, lug nuts, and studs - cracks, looseness, and/or condition *
+14. Hoses and tubing - condition, protection *
+15. Hydraulic Master cylinder - level, leaks, and/or condition *
+16. Parking brake - able to hold the vehicle *
+17. Emergency breakaway brake system *
+18. Air relay valves and tank - mounting *
+19. Brakes release after complete loss of service air *
+20. Wheel seals - leaks and/or condition *
+21. Under carriage - clean and secure *
+
+11.12 Save inspection behavior
+
+On save:
+
+- Validate required fields.
+- Create a new inspection record in session state.
+- Return user to the Inspection Compliance list.
+- New inspection should appear under the selected unit.
+
+12. CROSS-PAGE LINKING REQUIREMENTS
+
+This is important. The prototype should not behave like isolated pages.
+
+12.1 Maintenance Types linkage
+
+When a maintenance type is created/edited/deleted:
+
+- Maintenance Types table updates.
+- Plan page Maintenance Type dropdown updates.
+- Logs Maintenance Type dropdown updates.
+- Maintenance Bills log item Maintenance Type dropdown updates.
+- Due Maintenance Maintenance Type filter updates.
+
+12.2 Maintenance Plans linkage
+
+When a maintenance plan is created from Plan page, Logs modal, or Bills modal:
+
+- Plan table updates.
+- Logs Maintenance Plan dropdown updates.
+- Bills Maintenance Plan dropdown updates.
+- Due Maintenance Maintenance Plan dropdown updates.
+
+12.3 Vendors linkage
+
+When a vendor is created from Logs or Bills:
+
+- Vendor dropdown in Logs updates.
+- Vendor dropdown in Bills updates.
+
+12.4 Parts linkage
+
+When a part is created from Parts page:
+
+- Parts table updates.
+- Maintenance Bills dynamic log item section shows that part when Maintenance Log Type = Part.
+
+12.5 Maintenance Logs linkage
+
+When a maintenance log is created from:
+
+- Logs page create button
+- Due Maintenance row action
+- Maintenance Bill save flow
+
+It should appear in the Logs table.
+
+If the log is created from Due Maintenance, update the relevant due maintenance row for the current session.
+
+If the log is created from a Bill, include Bill Ref Number in the Logs table.
+
+12.6 Maintenance Bills linkage
+
+When a bill is created:
+
+- It appears in Maintenance Bills table.
+- Total amount is calculated from its maintenance log items.
+- Its bill ref number appears in linked log rows if linked log creation is implemented.
+
+13. VALIDATION REQUIREMENTS
+
+13.1 Required fields
+
+Required fields should show a simple validation message when missing.
+
+Example:
+
+- Name is required.
+- Maintenance Type is required.
+- Interval is required.
+- Vehicle is required.
+- Amount is required.
+
+13.2 Number fields
+
+The following fields should accept numeric values only:
+
+- Plan Interval
+- Mileage
+- Amount
+- Min Amount
+- Max Amount
+- Min Mileage
+- Max Mileage
+- Total Amount should be read-only/calculated in bills
+
+13.3 Dates
+
+Use simple date inputs or date picker components. Exact date picker library is not important.
+
+Default current date should be June 26, 2026 or the actual current browser date, depending on implementation simplicity.
+
+14. EXPORT REQUIREMENTS
+
+Export buttons should work at prototype level.
+
+Minimum acceptable behavior:
+
+- Generate CSV download for current table data.
+
+Pages requiring export behavior:
+
+- Plan
+- Logs
+- Maintenance Bills
+- Parts
+
+15. TABLE REQUIREMENTS
+
+Every table should have:
+
+- Hardcoded initial rows where applicable.
+- Search/filter behavior where specified.
+- Rows per page dropdown.
+- Pagination footer, even if simple/static.
+- Row actions where specified.
+- Clear visual separation of columns and rows.
+
+16. ACCEPTANCE CRITERIA
+
+The prototype is acceptable if all of the following are true:
+
+1. App deploys as a Vercel frontend.
+2. No backend is required.
+3. All 7 pages are present and linked through navigation.
+4. Every page loads with hardcoded seed data.
+5. Create/edit/delete actions work at least at session-state level.
+6. Data persists while the browser session is open.
+7. Data can reset after browser/tab is closed.
+8. New maintenance type appears in related dropdowns across pages.
+9. New maintenance plan appears in related dropdowns and Plan table.
+10. New vendor appears in Logs and Bills vendor dropdowns.
+11. New part appears in Maintenance Bills part dropdown.
+12. Creating a maintenance log adds a visible row to Logs.
+13. Creating a maintenance bill adds a visible row to Maintenance Bills.
+14. Creating a log from Due Maintenance opens the log modal prefilled and updates Logs after saving.
+15. Creating an inspection adds it to the selected unit inspection table.
+16. Filters/search bars work at basic frontend level.
+17. Export buttons download table data as CSV or Excel-compatible file.
+18. Modals, drawers, toggles, dropdowns, tabs, and row action menus are clickable.
+19. The UI looks like a clean enterprise TMS admin module.
+20. The project does not spend effort on backend APIs, real integrations, or pixel-perfect Figma replication.
+
+17. OUT OF SCOPE
+
+Do not build:
+
+- Real backend
+- Real database
+- Real login/authentication
+- Real PullRay integration
+- Real vendor API integration
+- Real Excel backend export service
+- Real PDF generation service
+- Real dispatch validation engine
+- Real mileage sync
+- Real carrier/vehicle/trailer master data integration
+- Pixel-perfect Figma recreation
+
+18. NICE-TO-HAVE BUT NOT REQUIRED
+
+These are optional if time allows:
+
+- Toast messages after save/delete.
+- Confirmation modal before delete.
+- Responsive layout for tablet/mobile.
+- Mock PDF/printable view for inspection annual report.
+- Color-coded due maintenance status.
+- Empty state designs when filters return no data.
+- Simple dashboard counts on each page.
+
+19. FINAL DELIVERABLE
+
+Deliver a working frontend prototype of the Maintenance Module with all listed pages, seeded data, session-level state, linked dropdowns, modals, filters, tables, row actions, and basic exports.
+
+The end result should allow a user to open the Vercel URL, explore the full maintenance module, create/edit prototype records, and see those records reflected across pages until the browser session is closed.
