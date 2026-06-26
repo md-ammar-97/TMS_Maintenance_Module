@@ -2,6 +2,8 @@
 
 Practical edge cases to handle. Since this is a **visual prototype with session-state only**, the bar is: "should not crash or look broken." Not: "production-grade error handling."
 
+> Visual treatment (colors, chips, empty states) follows `design.md`. The "Due In" thresholds in §6.6 below are the **canonical** rule and are mirrored in `design.md §9.4` and `data_model.md`.
+
 ---
 
 ## 1. SESSION STATE & DATA INIT
@@ -75,6 +77,10 @@ try {
 - **Case**: User switches Maintenance Log Type from "Service" to "Part" and back.
 - **Handle**: Use conditional render (`logType === 'Part'`). Clear the hidden field's value when switching type to avoid stale selection being submitted.
 
+### 2.11 Conditional Mileage on Vehicle vs Trailer
+- **Case**: Bill and Log modals require Mileage on the Vehicle tab but hide it on the Trailer tab. A user fills Mileage on Vehicle, switches to Trailer, and saves.
+- **Handle**: Mileage is **required only when the active unit type is Vehicle**. On switching to Trailer, hide the field and clear its value so a stale Vehicle mileage is never submitted on a Trailer record. Validation must check the active tab, not a fixed rule.
+
 ---
 
 ## 3. TABLE & FILTER EDGE CASES
@@ -88,7 +94,7 @@ try {
   Try adjusting your filters or clear them.
   [Clear Filters button]
   ```
-  Style: centered in table body, `color: #6B7280`, `padding: 48px 0`.
+  Style: centered in table body, `color: var(--content-tertiary)`, `padding: 64px 0` (`design.md §11.10`).
 
 ### 3.2 Empty Table on First Load (No Seed Data)
 - **Case**: Seed data fails to load (e.g., sessionStorage error on first visit).
@@ -196,7 +202,7 @@ try {
 
 ### 6.6 "Due In" Value Display
 - **Case**: Due In is `0 miles` (exactly due now) — is it Upcoming or Overdue?
-- **Handle**: `<= 0` → Overdue (red). `1–2000 miles` → Upcoming (amber). `> 2000 miles` → OK (green). For date-based: `past` → Overdue, `within 30 days` → Upcoming, `> 30 days` → OK.
+- **Handle (canonical, = `design.md §9.4`)**: Mileage mode — `≤ 0` → Overdue (red, `arrow-down`); `1–2,000 mi` → Upcoming (amber, `clock`); `> 2,000 mi` → OK (green, `check`). Date mode — `past` → Overdue; `within 30 days` → Upcoming; `> 30 days` → OK. Exactly `0` falls in the `≤ 0` bucket → **Overdue**.
 
 ### 6.7 Dropdown with Many Options (21 Carriers)
 - **Case**: Carrier dropdown has 21 entries — needs to be scrollable.

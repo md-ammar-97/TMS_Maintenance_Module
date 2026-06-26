@@ -1,6 +1,5 @@
 'use client'
 
-import { Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface SearchInputProps {
@@ -12,18 +11,13 @@ interface SearchInputProps {
 
 export function SearchInput({ value, onChange, placeholder = 'Search...', className }: SearchInputProps) {
   return (
-    <div className={cn('relative', className)}>
-      <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-4)' }} />
+    <div className={cn('relative flex items-center', className)}>
+      <span className="material-symbols-outlined absolute left-3 text-on-surface-variant text-[16px]">search</span>
       <input
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="h-8 pl-8 pr-3 text-[12px] rounded-md border outline-none transition-colors w-52"
-        style={{
-          background: 'var(--surface)',
-          borderColor: 'var(--border)',
-          color: 'var(--text-1)',
-        }}
+        className="h-9 pl-9 pr-3 text-sm rounded border outline-none transition-colors w-52 bg-surface-container-low border-border text-on-surface placeholder:text-outline focus:ring-1 focus:ring-primary focus:border-primary"
       />
     </div>
   )

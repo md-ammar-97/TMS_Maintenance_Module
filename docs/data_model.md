@@ -2,6 +2,8 @@
 
 All types are defined in TypeScript. No backend schema is required — these are in-memory / sessionStorage shapes.
 
+> **How fields are displayed** (colors, icons, chips, badges, em-dash-for-empty, tabular numerals) is governed entirely by the **Data Encoding System** in `design.md §9`. This file defines the *shape and meaning* of each field; `design.md` defines how each value *renders*. The two are kept in sync — e.g. a `dueStatus` of `Overdue` here maps to the `negative` "Due In" chip there.
+
 ---
 
 ## 1. SHARED ENUMERATIONS
@@ -204,7 +206,7 @@ interface Trailer {
 interface Vendor {
   id: string
   name: string
-  vendorId: string      // external vendor ID (optional)
+  vendorId: string      // EXTERNAL vendor ID (General Information section) — distinct from accountingVendorId
   address: string
   address2: string
   city: string
@@ -213,9 +215,9 @@ interface Vendor {
   phone: string
   fax: string
   email: string
-  status: boolean       // true = active
+  status: boolean       // true = active  (NOTE: boolean status — Vehicles/Trailers use the VehicleStatus enum instead)
   // Accounting
-  accountingVendorId: string
+  accountingVendorId: string  // ACCOUNTING vendor ID (Accounting section) — separate value from vendorId above
   classId: string
   taxType: string       // "Not A 1099 Vendor" | "Dividend" | "Interest" | "Miscellaneous" | "Nonemployee Compensation"
   box1099: string
@@ -276,7 +278,7 @@ interface MaintenanceLog {
   vehicleId?: string                  // → Vehicle.id (if unitType = Vehicle)
   trailerId?: string                  // → Trailer.id (if unitType = Trailer)
   maintenanceTypeId: string           // → MaintenanceType.id
-  externalMaintenanceType?: string    // free-text external label
+  externalMaintenanceType?: string    // free-text external label; render '—' when empty (drives the "External Maintenance Type" column)
   maintenancePlanId?: string          // → MaintenancePlan.id
   tirePosition?: TirePosition
   vendorId?: string                   // → Vendor.id
@@ -290,7 +292,7 @@ interface MaintenanceLog {
   description?: string
   createdBy: string                   // username / inspector name
   billRefNumber?: string              // linked bill ref if created from a bill
-  billId?: string                     // → MaintenanceBill.id
+  billId?: string                     // → MaintenanceBill.id — PRESENCE defines Log Status: billId set ⇒ "Mapped", else "UnMapped"
   createdAt: string
 }
 ```
@@ -366,13 +368,15 @@ interface DueMaintenanceRecord {
 }
 ```
 
-**Due status color logic:**
+**Due status → display (canonical rule, see `design.md §9.4`):**
 
-| dueStatus | Display color |
-|-----------|--------------|
-| OK | Green |
-| Upcoming | Yellow/Orange |
-| Overdue | Red |
+| dueStatus | Condition (Mileage mode) | Condition (Date mode) | "Due In" chip |
+|-----------|--------------------------|------------------------|---------------|
+| `Overdue` | `dueIn ≤ 0` | due date in the past | Red (`negative`) |
+| `Upcoming` | `1 … 2,000 mi` | within next 30 days | Amber (`warning`) |
+| `OK` | `> 2,000 mi` | more than 30 days out | Green (`positive`) |
+
+This single rule supersedes the older, conflicting thresholds. `dueStatus` is computed from `dueMileage − currentMileage` (Mileage) or `dueDate − today` (Date).
 
 ---
 
@@ -408,6 +412,11 @@ interface Inspection {
   createdAt: string
 }
 ```
+
+**Derived inspection status** (not stored — computed for display):
+- `defectCount = items.filter(i => i.result === 'Def').length`
+- `status = defectCount === 0 ? 'Passed' : 'Needs Minor Repair'`
+- Render: `Passed` → `positive` badge · `Needs Minor Repair` → `warning` badge · `defectCount` → `—` when 0, else a `negative` chip (`design.md §9.3, §14.7`).
 
 ---
 
@@ -487,6 +496,28 @@ export const TRAILER_INSPECTION_ITEMS: Omit<InspectionItem, 'result'>[] = [
   { itemNumber: 21, description: 'Under carriage - clean and secure' },
 ]
 ```
+
+---
+
+## 4A. SEEDED INSPECTORS
+
+The "Inspection by" dropdown reads from this fixed list (resolves the earlier blank-vs-named inconsistency):
+
+```ts
+export const INSPECTORS = ['John Miller', 'Sarah Lee', 'David Brown', 'Mike Johnson'] as const
+```
+
+---
+
+## 4B. DERIVED / DISPLAY-ONLY VALUES (not stored)
+
+| Concept | Where shown | Definition |
+|---------|-------------|------------|
+| **Log Status** (Mapped / UnMapped) | Logs table | `Mapped` if `log.billId` is set, else `UnMapped` |
+| **Plan "Total Overdue"** | Plan table | count of units overdue against that plan = `dueMaintenance.filter(d => d.maintenancePlanId === plan.id && d.dueStatus === 'Overdue').length` |
+| **Inspection status / Defects** | Inspection records | see §2.13 (Passed / Needs Minor Repair; defectCount) |
+| **Logs "Total Amount"** | Logs header stat | sum of `amount` for logs on the active Vehicle/Trailer tab |
+| **Bill "Total Amount"** | Bill modal + table | `logItems.reduce((s,i) => s + (i.amount||0), 0)` |
 
 ---
 

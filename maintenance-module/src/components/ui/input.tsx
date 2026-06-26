@@ -8,24 +8,19 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, error, style, ...props }, ref) => (
+  ({ className, error, ...props }, ref) => (
     <div className="w-full">
       <input
         ref={ref}
-        style={{
-          background: 'var(--surface)',
-          color: 'var(--text-1)',
-          borderColor: error ? '#ef4444' : 'var(--border)',
-          ...style,
-        }}
         className={cn(
-          'h-9 w-full rounded-md border px-3 text-[13px] placeholder:opacity-40 outline-none transition-colors',
-          'focus:ring-2 focus:ring-blue-500/20',
+          'h-9 w-full rounded border px-3 text-sm text-on-surface bg-surface-container-low border-border',
+          'placeholder:text-outline focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors',
+          error && 'border-error',
           className
         )}
         {...props}
       />
-      {error && <p className="mt-1 text-[11px] text-red-500">{error}</p>}
+      {error && <p className="mt-1 text-xs text-error">{error}</p>}
     </div>
   )
 )

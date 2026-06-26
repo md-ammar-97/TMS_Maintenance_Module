@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { useApp } from '@/context/AppContext'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ConfirmDeleteDialog } from '@/components/shared/ConfirmDeleteDialog'
+import { ExportButton } from '@/components/shared/ExportButton'
 import { PartModal } from './PartModal'
 import type { Part } from '@/types'
 
@@ -21,6 +22,7 @@ export default function PartsPage() {
     search ? parts.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.description.toLowerCase().includes(search.toLowerCase())) : parts,
     [parts, search]
   )
+  const exportRows = filtered.map(part => ({ Name: part.name, Description: part.description }))
 
   function toggleSelect(id: string) {
     setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
@@ -61,6 +63,7 @@ export default function PartsPage() {
             />
           </div>
           <span className="text-xs text-on-surface-variant font-mono ml-auto">{filtered.length} items found</span>
+          <ExportButton filename="parts" columns={['Name', 'Description']} rows={exportRows} />
         </div>
 
         <table className="w-full text-left border-collapse">
@@ -72,7 +75,7 @@ export default function PartsPage() {
               <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-on-surface-variant font-mono">Part Name</th>
               <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-on-surface-variant font-mono hidden sm:table-cell">SKU / ID</th>
               <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-on-surface-variant font-mono">Description</th>
-              <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-on-surface-variant font-mono w-16">Edit</th>
+              <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-on-surface-variant font-mono w-24">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border text-sm">
@@ -98,12 +101,20 @@ export default function PartsPage() {
                   </td>
                   <td className="p-4 text-on-surface-variant truncate max-w-[200px] md:max-w-none">{part.description || '—'}</td>
                   <td className="p-4">
-                    <button
-                      onClick={() => { setEditPart(part); setModalOpen(true) }}
-                      className="opacity-0 group-hover:opacity-100 text-on-surface-variant hover:text-primary transition-all p-1 rounded hover:bg-surface-container-highest"
-                    >
-                      <span className="material-symbols-outlined text-[16px]">edit</span>
-                    </button>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => { setEditPart(part); setModalOpen(true) }}
+                        className="opacity-0 group-hover:opacity-100 text-on-surface-variant hover:text-primary transition-all p-1 rounded hover:bg-surface-container-highest"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">edit</span>
+                      </button>
+                      <button
+                        onClick={() => setDeleteId(part.id)}
+                        className="opacity-0 group-hover:opacity-100 text-on-surface-variant hover:text-error transition-all p-1 rounded hover:bg-error/10"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">delete</span>
+                      </button>
+                    </div>
                   </td>
                 </motion.tr>
               ))

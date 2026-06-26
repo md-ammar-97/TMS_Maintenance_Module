@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { motion } from 'framer-motion'
 import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/lib/utils'
 
@@ -40,63 +41,62 @@ export function DataTable<T>({
 
   return (
     <div className="flex-1 overflow-auto">
-      <table className="w-full min-w-max text-[13px]">
-        <thead className="sticky top-0 z-10">
-          <tr style={{ background: 'var(--surface-dim)', borderBottom: '1px solid var(--border)' }}>
+      <table className="w-full min-w-max text-left border-collapse">
+        <thead>
+          <tr className="bg-surface-container-low border-b border-border">
             {selectable && (
-              <th className="w-10 px-4 py-2.5">
+              <th className="w-10 px-4 py-3">
                 <Checkbox checked={allSelected} onCheckedChange={toggleAll} />
               </th>
             )}
             {columns.map(col => (
               <th
                 key={col.key}
-                className={cn('px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wide', col.width, col.className)}
-                style={{ color: 'var(--text-3)' }}
+                className={cn('px-4 py-3 text-xs font-medium uppercase tracking-wider text-on-surface-variant font-mono', col.width, col.className)}
               >
                 {col.header}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-border text-sm">
           {data.length === 0 ? (
             <tr>
               <td
                 colSpan={columns.length + (selectable ? 1 : 0)}
-                className="px-4 py-12 text-center text-[13px]"
-                style={{ color: 'var(--text-4)' }}
+                className="px-4 py-12 text-center text-sm text-outline"
               >
                 {emptyMessage}
               </td>
             </tr>
           ) : (
-            data.map(row => {
+            data.map((row, i) => {
               const id = getRowId(row)
               const isSelected = selectedIds.includes(id)
               return (
-                <tr
+                <motion.tr
                   key={id}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.15, delay: i * 0.02 }}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
-                  className={cn('group h-12 transition-colors', onRowClick && 'cursor-pointer')}
-                  style={{
-                    borderBottom: '1px solid var(--border-subtle)',
-                    background: isSelected ? 'rgba(0,112,243,0.08)' : undefined,
-                  }}
-                  onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = 'var(--surface-high)' }}
-                  onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+                  className={cn(
+                    'group transition-colors',
+                    onRowClick && 'cursor-pointer',
+                    isSelected ? 'bg-primary-container/10' : 'hover:bg-surface-container-lowest/50'
+                  )}
                 >
                   {selectable && (
-                    <td className="w-10 px-4" onClick={e => { e.stopPropagation(); toggleRow(id) }}>
+                    <td className="w-10 px-4 py-3" onClick={e => { e.stopPropagation(); toggleRow(id) }}>
                       <Checkbox checked={isSelected} onCheckedChange={() => toggleRow(id)} />
                     </td>
                   )}
                   {columns.map(col => (
-                    <td key={col.key} className={cn('px-4 py-0', col.className)}>
+                    <td key={col.key} className={cn('px-4 py-3', col.className)}>
                       {col.render(row)}
                     </td>
                   ))}
-                </tr>
+                </motion.tr>
               )
             })
           )}

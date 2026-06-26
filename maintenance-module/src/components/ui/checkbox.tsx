@@ -1,7 +1,6 @@
 'use client'
 
 import * as RadixCheckbox from '@radix-ui/react-checkbox'
-import { Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface CheckboxProps {
@@ -21,16 +20,13 @@ export function Checkbox({ checked, onCheckedChange, disabled, className, id }: 
       disabled={disabled}
       className={cn(
         'w-4 h-4 rounded flex-shrink-0 flex items-center justify-center transition-colors cursor-pointer outline-none border',
+        checked ? 'bg-primary-container border-primary-container' : 'bg-transparent border-outline-variant hover:border-primary-container',
         disabled && 'opacity-50 cursor-not-allowed',
         className
       )}
-      style={checked
-        ? { background: 'var(--primary)', borderColor: 'var(--primary)' }
-        : { background: 'var(--surface)', borderColor: 'var(--border)' }
-      }
     >
       <RadixCheckbox.Indicator>
-        <Check size={11} className="text-white" strokeWidth={3} />
+        <span className="material-symbols-outlined text-white text-[12px]" style={{ fontVariationSettings: "'wght' 700" }}>check</span>
       </RadixCheckbox.Indicator>
     </RadixCheckbox.Root>
   )

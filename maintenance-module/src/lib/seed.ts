@@ -2,6 +2,8 @@ import type {
   MaintenanceType, MaintenancePlan, Carrier, Vehicle, Trailer,
   Vendor, Part, MaintenanceLog, MaintenanceBill, DueMaintenanceRecord, Inspection,
 } from '@/types'
+import { VEHICLE_INSPECTION_ITEMS, TRAILER_INSPECTION_ITEMS } from '@/types'
+export { INSPECTORS } from '@/types'
 
 export const SEED_MAINTENANCE_TYPES: MaintenanceType[] = [
   { id: 'mt-1', name: 'Oil Change', description: 'Every 30,000–35,000 Miles', createdAt: '2026-01-01T00:00:00Z' },
@@ -202,36 +204,27 @@ export const SEED_DUE_MAINTENANCE: DueMaintenanceRecord[] = [
   // OK (green) — plenty of miles/time left
   { id: 'due-1', maintenancePlanId: 'mp-1', unitType: 'Vehicle', vehicleId: 'v-1', lastServiceDate: '2026-04-15', lastServiceMileage: 302000, currentMileage: 312400, dueMileage: 332000, dueStatus: 'OK', dueIn: '+19,600 mi' },
   { id: 'due-2', maintenancePlanId: 'mp-1', unitType: 'Vehicle', vehicleId: 'v-2', lastServiceDate: '2026-05-20', lastServiceMileage: 190000, currentMileage: 198700, dueMileage: 220000, dueStatus: 'OK', dueIn: '+21,300 mi' },
-  { id: 'due-3', maintenancePlanId: 'mp-1', unitType: 'Vehicle', vehicleId: 'v-3', lastServiceDate: '2026-01-10', lastServiceMileage: 218000, currentMileage: 245100, dueMileage: 248000, dueStatus: 'Upcoming', dueIn: '+2,900 mi' },
+  { id: 'due-3', maintenancePlanId: 'mp-1', unitType: 'Vehicle', vehicleId: 'v-3', lastServiceDate: '2026-01-10', lastServiceMileage: 218000, currentMileage: 245100, dueMileage: 248000, dueStatus: 'OK', dueIn: '+2,900 mi' },
   // Upcoming (amber) — close to due
   { id: 'due-4', maintenancePlanId: 'mp-2', unitType: 'Vehicle', vehicleId: 'v-4', lastServiceDate: '2026-03-01', currentMileage: 87300, dueDate: '2026-06-01', dueStatus: 'Overdue', dueIn: '-25 days' },
   { id: 'due-5', maintenancePlanId: 'mp-1', unitType: 'Vehicle', vehicleId: 'v-5', lastServiceDate: '2026-04-01', lastServiceMileage: 126000, currentMileage: 156200, dueMileage: 156000, dueStatus: 'Overdue', dueIn: '-200 mi' },
   { id: 'due-6', maintenancePlanId: 'mp-3', unitType: 'Vehicle', vehicleId: 'v-6', lastServiceDate: '2025-06-01', currentMileage: 210500, dueDate: '2026-06-01', dueStatus: 'Overdue', dueIn: '-25 days' },
-  { id: 'due-7', maintenancePlanId: 'mp-1', unitType: 'Vehicle', vehicleId: 'v-8', lastServiceDate: '2026-03-20', lastServiceMileage: 308000, currentMileage: 321000, dueMileage: 338000, dueStatus: 'Upcoming', dueIn: '+17,000 mi' },
+  { id: 'due-7', maintenancePlanId: 'mp-1', unitType: 'Vehicle', vehicleId: 'v-8', lastServiceDate: '2026-03-20', lastServiceMileage: 308000, currentMileage: 321000, dueMileage: 338000, dueStatus: 'OK', dueIn: '+17,000 mi' },
   // Trailers
   { id: 'due-t1', maintenancePlanId: 'mp-2', unitType: 'Trailer', trailerId: 't-1', lastServiceDate: '2026-02-01', dueDate: '2026-05-01', dueStatus: 'Overdue', dueIn: '-56 days' },
   { id: 'due-t2', maintenancePlanId: 'mp-3', unitType: 'Trailer', trailerId: 't-2', lastServiceDate: '2025-07-01', dueDate: '2026-07-01', dueStatus: 'Upcoming', dueIn: '+5 days' },
-  { id: 'due-t3', maintenancePlanId: 'mp-2', unitType: 'Trailer', trailerId: 't-3', lastServiceDate: '2026-04-01', dueDate: '2026-07-01', dueStatus: 'OK', dueIn: '+5 days' },
+  { id: 'due-t3', maintenancePlanId: 'mp-2', unitType: 'Trailer', trailerId: 't-3', lastServiceDate: '2026-04-01', dueDate: '2026-07-01', dueStatus: 'Upcoming', dueIn: '+5 days' },
 ]
 
 // Inspection seed — items all set to 'OK' for brevity
-function makeItems(count: number): { itemNumber: number; description: string; result: 'OK' | 'NA' | 'Def' }[] {
-  const descriptions = [
-    'Fire extinguisher and reflective warning devices', 'Horn and gauges', 'Mirrors and supports',
-    'Windshield wipers', 'All lights and signals', 'Electrical wiring',
-    'Batteries', 'Warning devices', 'Radiator hoses', 'Belts',
-    'Air hoses', 'Fuel system', 'Exhaust system', 'Engine mounting', 'Clutch adjustment',
-    'Air filter', 'Starting system', 'Tractor protection valve', 'Hydraulic brake system', 'Hydraulic master cylinder',
-    'Hoses and tubing', 'Air brake system', 'Air loss test', 'Air compressor', 'Primary air tank',
-    'Other air tanks', 'Tires', 'Housing system', 'Parking brake', 'Emergency stopping',
-    'Brakes release', 'Steering system', 'Steering arms', 'Connecting devices', 'Suspension system',
-    'Frame and cross members', 'Drive shaft', 'Transmission', 'Wheel seals', 'Under carriage',
-    'Mudflaps', 'Air brake system (trailer)',
-  ]
-  return Array.from({ length: count }, (_, i) => ({
-    itemNumber: i + 1,
-    description: descriptions[i] ?? `Item ${i + 1}`,
-    result: i === 7 ? 'Def' : i === 14 ? 'NA' : 'OK',
+function makeInspectionItems(
+  base: typeof VEHICLE_INSPECTION_ITEMS | typeof TRAILER_INSPECTION_ITEMS,
+  defects: number[] = [],
+  na: number[] = [],
+): Inspection['items'] {
+  return base.map(item => ({
+    ...item,
+    result: defects.includes(item.itemNumber) ? 'Def' : na.includes(item.itemNumber) ? 'NA' : 'OK',
   }))
 }
 
@@ -239,41 +232,41 @@ export const SEED_INSPECTIONS: Inspection[] = [
   {
     id: 'insp-v1', unitType: 'Vehicle', vehicleId: 'v-1', carrierId: 'c-1',
     mileage: 308000, inspectionDate: '2026-01-15', inspectionBy: 'John Miller',
-    items: makeItems(40), createdAt: '2026-01-15T09:00:00Z',
+    items: makeInspectionItems(VEHICLE_INSPECTION_ITEMS, [], [18]), createdAt: '2026-01-15T09:00:00Z',
   },
   {
     id: 'insp-v2', unitType: 'Vehicle', vehicleId: 'v-1', carrierId: 'c-1',
     mileage: 312400, inspectionDate: '2026-06-20', inspectionBy: 'Sarah Lee',
-    items: makeItems(40), createdAt: '2026-06-20T10:00:00Z',
+    items: makeInspectionItems(VEHICLE_INSPECTION_ITEMS, [8], [18]), createdAt: '2026-06-20T10:00:00Z',
   },
   {
     id: 'insp-v3', unitType: 'Vehicle', vehicleId: 'v-2', carrierId: 'c-2',
     mileage: 194000, inspectionDate: '2025-12-10', inspectionBy: 'David Brown',
-    items: makeItems(40), createdAt: '2025-12-10T08:00:00Z',
+    items: makeInspectionItems(VEHICLE_INSPECTION_ITEMS, [], [18]), createdAt: '2025-12-10T08:00:00Z',
   },
   {
     id: 'insp-v4', unitType: 'Vehicle', vehicleId: 'v-2', carrierId: 'c-2',
     mileage: 198700, inspectionDate: '2026-05-15', inspectionBy: 'Mike Johnson',
-    items: makeItems(40), createdAt: '2026-05-15T11:00:00Z',
+    items: makeInspectionItems(VEHICLE_INSPECTION_ITEMS, [27], [18]), createdAt: '2026-05-15T11:00:00Z',
   },
   {
     id: 'insp-t1', unitType: 'Trailer', trailerId: 't-1', carrierId: 'c-1',
     inspectionDate: '2026-02-20', inspectionBy: 'John Miller',
-    items: makeItems(21), createdAt: '2026-02-20T09:00:00Z',
+    items: makeInspectionItems(TRAILER_INSPECTION_ITEMS), createdAt: '2026-02-20T09:00:00Z',
   },
   {
     id: 'insp-t2', unitType: 'Trailer', trailerId: 't-1', carrierId: 'c-1',
     inspectionDate: '2026-06-10', inspectionBy: 'Sarah Lee',
-    items: makeItems(21), createdAt: '2026-06-10T10:00:00Z',
+    items: makeInspectionItems(TRAILER_INSPECTION_ITEMS, [6]), createdAt: '2026-06-10T10:00:00Z',
   },
   {
     id: 'insp-t3', unitType: 'Trailer', trailerId: 't-2', carrierId: 'c-2',
     inspectionDate: '2026-03-05', inspectionBy: 'David Brown',
-    items: makeItems(21), createdAt: '2026-03-05T08:00:00Z',
+    items: makeInspectionItems(TRAILER_INSPECTION_ITEMS), createdAt: '2026-03-05T08:00:00Z',
   },
   {
     id: 'insp-t4', unitType: 'Trailer', trailerId: 't-2', carrierId: 'c-2',
     inspectionDate: '2026-05-30', inspectionBy: 'Mike Johnson',
-    items: makeItems(21), createdAt: '2026-05-30T11:00:00Z',
+    items: makeInspectionItems(TRAILER_INSPECTION_ITEMS, [12]), createdAt: '2026-05-30T11:00:00Z',
   },
 ]

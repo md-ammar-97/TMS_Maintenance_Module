@@ -18,12 +18,12 @@ export function ConfirmDeleteDialog({
 }: ConfirmDeleteDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent title={title} size="sm">
+      <DialogContent title={title} size="sm" open={open}>
         <div className="px-5 py-4">
-          <p className="text-[13px]" style={{ color: 'var(--text-2)' }}>{description}</p>
+          <p className="text-sm text-on-surface-variant">{description}</p>
           <div className="flex justify-end gap-2 mt-5">
-            <Button variant="secondary" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={() => { onConfirm(); onOpenChange(false) }}>Delete</Button>
+            <Button variant="secondary" size="sm" onClick={() => onOpenChange(false)}>Cancel</Button>
+            <Button variant="destructive" size="sm" onClick={() => { onConfirm(); onOpenChange(false) }}>Delete</Button>
           </div>
         </div>
       </DialogContent>

@@ -77,6 +77,8 @@ Exact route names can vary, but all pages must be accessible and linked.
 
 ### 3.4 UI Style
 
+> **Visual design is fully specified in `design.md`** — an **Uber Base** foundation (light-first, dark parity) organized as a Figma token library, with a Data Encoding System that color/icon-codes the dense tables. The points below are the baseline; `design.md` is authoritative.
+
 - Keep the UI clean, enterprise SaaS-style, similar to a TMS admin dashboard.
 - Use tables, filter bars, primary/secondary buttons, dropdowns, date pickers, toggles, drawers, modals, tabs, and row action menus.
 - Primary buttons should be visually prominent.
@@ -103,6 +105,8 @@ Create shared frontend state for the following entities:
 11. Inspection Records
 
 All pages should read from and update the same shared session data.
+
+> **Dropdown rule (applies everywhere):** every Maintenance Type, Maintenance Plan, Vendor, Part, Carrier, Vehicle, and Trailer dropdown is **derived from the shared session state** — never a page-local hardcoded list. Vehicle/Trailer dropdowns therefore show the full seeded fleet (12 vehicles / 10 trailers); inactive units appear with an `(Inactive)` suffix based on their `status`, not as separate hardcoded rows. This is what keeps the pages linked (e.g. a new type created on the Types page appears in every type dropdown in the same session).
 
 ### 4.1 Required Seeded Maintenance Types
 
@@ -231,8 +235,8 @@ Parts should populate a Part dropdown in Maintenance Bills when Maintenance Log 
 | Description | Text area | No | — |
 | Interval Type | Dropdown | Yes | Days / Months / Mileage |
 | Interval | Number input | Yes | Numbers only |
-| Validate Upcoming Maintenance At Dispatch | Switch | No | Boolean |
-| Validate Due Maintenance At Dispatch | Switch | No | Boolean |
+| Validate Upcoming Maintenance At Dispatch | Switch | No | Boolean. **Prototype: stores the value only — no dispatch logic runs (dispatch engine is out of scope).** |
+| Validate Due Maintenance At Dispatch | Switch | No | Boolean. **Prototype: stores the value only — no dispatch logic runs.** |
 | Status | Switch | No | Default: On/True |
 
 **Footer:** Save / Cancel
@@ -245,7 +249,7 @@ Parts should populate a Part dropdown in Maintenance Bills when Maintenance Log 
 |--------|------|---------|
 | General search | Text | Name or Description |
 | Name search | Text | Name only |
-| Maintenance Type | Dropdown | All, OilChange, TuneUp, Service, Brakes, TireReplacement, TireRepair, Repair, Engine, TrailerService, Towing, Wash, Inspection, Misc |
+| Maintenance Type | Dropdown | `All` + the shared Maintenance Types (Oil Change, Truck Tires, Engine Work, Trailer Work, Trailer Tires, Reefer Work, Truck Work, plus any created at runtime). **Derived from shared state — not a hardcoded list.** |
 | Interval Type | Dropdown | All, Days, Months, Mileage |
 | Status | Dropdown | All, False, True |
 
@@ -424,7 +428,7 @@ Same as Vehicle tab, except:
 
 | Field | Type | Options |
 |-------|------|---------|
-| Vendor Id | Text | — |
+| Vendor Id (Accounting) | Text | — — *distinct from the General-section "Vendor ID"; this is the accounting ledger ID* |
 | Class Id | Dropdown | Select |
 | Tax Type | Dropdown | Select / Not A 1099 Vendor / Dividend / Interest / Miscellaneous / Nonemployee Compensation |
 | 1099 Box | Dropdown | Select |
@@ -609,7 +613,7 @@ Each block contains:
 ### 9.2 Header Actions
 
 - **+ Create new part** — primary button
-- **Three-dot menu** → Export to Excel
+- **Three-dot menu** → Export (downloads a **CSV**; labeled "Export to Excel" in the UI but the prototype produces a `.csv`, per the CSV-only constraint)
 
 ### 9.3 Filter Bar
 

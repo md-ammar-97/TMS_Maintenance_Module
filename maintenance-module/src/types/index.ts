@@ -83,7 +83,7 @@ export interface MaintenanceLog {
   unitType: UnitType
   vehicleId?: string
   trailerId?: string
-  maintenanceTypeId?: string
+  maintenanceTypeId: string
   externalMaintenanceType?: string
   maintenancePlanId?: string
   tirePosition?: TirePosition
@@ -118,7 +118,7 @@ export interface MaintenanceBill {
   unitType: UnitType
   vehicleId?: string
   trailerId?: string
-  vendorId?: string
+  vendorId: string
   carrierId?: string
   billDate: string
   currency: Currency
@@ -160,13 +160,15 @@ export interface Inspection {
   unitType: UnitType
   vehicleId?: string
   trailerId?: string
-  carrierId?: string
+  carrierId: string
   mileage?: number
   inspectionDate: string
-  inspectionBy?: string
+  inspectionBy: string
   items: InspectionItem[]
   createdAt: string
 }
+
+export const INSPECTORS = ['John Miller', 'Sarah Lee', 'David Brown', 'Mike Johnson'] as const
 
 export const VEHICLE_INSPECTION_ITEMS: Omit<InspectionItem, 'result'>[] = [
   { itemNumber: 1, description: 'Fire extinguisher and reflective warning devices' },

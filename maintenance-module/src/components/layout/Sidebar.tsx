@@ -2,91 +2,88 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import {
-  ClipboardList, FileText, Wrench, Receipt, Package,
-  AlertCircle, ClipboardCheck, Settings, HelpCircle, Plus,
-} from 'lucide-react'
+import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 const NAV_ITEMS = [
-  { label: 'Plan',              href: '/maintenance/plan',             icon: ClipboardList },
-  { label: 'Logs',              href: '/maintenance/logs',             icon: FileText },
-  { label: 'Maintenance Types', href: '/maintenance/types',            icon: Wrench },
-  { label: 'Bills',             href: '/maintenance/bills',            icon: Receipt },
-  { label: 'Parts',             href: '/maintenance/parts',            icon: Package },
-  { label: 'Due Maintenance',   href: '/maintenance/due-maintenance',  icon: AlertCircle },
-  { label: 'Inspection',        href: '/maintenance/inspection',       icon: ClipboardCheck },
+  { label: 'Plan',              href: '/maintenance/plan',            icon: 'calendar_today' },
+  { label: 'Logs',              href: '/maintenance/logs',            icon: 'assignment' },
+  { label: 'Maintenance Types', href: '/maintenance/types',           icon: 'category' },
+  { label: 'Bills',             href: '/maintenance/bills',           icon: 'receipt_long' },
+  { label: 'Parts',             href: '/maintenance/parts',           icon: 'settings_input_component' },
+  { label: 'Due Maintenance',   href: '/maintenance/due-maintenance', icon: 'priority_high' },
+  { label: 'Inspection',        href: '/maintenance/inspection',      icon: 'fact_check' },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <aside
-      className="w-[160px] flex-shrink-0 flex flex-col h-full border-r"
-      style={{ background: 'var(--sidebar-bg)', borderColor: 'var(--border)' }}
-    >
+    <nav className="hidden md:flex flex-col h-screen overflow-y-auto py-4 bg-surface-container-lowest border-r border-border fixed left-0 top-0 w-60 z-40">
       {/* Logo */}
-      <div className="px-4 pt-4 pb-3" style={{ borderBottom: '1px solid var(--border)' }}>
-        <div className="text-[13px] font-bold" style={{ color: 'var(--text-1)' }}>FreightNXT</div>
-        <div className="text-[9px]" style={{ color: 'var(--text-4)' }}>(by Axestrack)</div>
+      <div className="px-6 mb-8">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded bg-primary-container flex items-center justify-center text-on-primary-container text-xs font-bold flex-shrink-0">
+            FX
+          </div>
+          <div>
+            <h1 className="text-base font-bold text-on-surface leading-tight">FreightNXT</h1>
+            <p className="text-xs text-on-surface-variant">(by Axestrack)</p>
+          </div>
+        </div>
       </div>
 
       {/* Create Work Order */}
-      <div className="px-3 pt-3 pb-2">
-        <button
-          className="w-full flex items-center justify-center gap-1.5 h-8 text-white text-[11px] font-semibold rounded-md transition-colors"
-          style={{ background: 'var(--primary)' }}
-          onMouseEnter={e => (e.currentTarget.style.background = 'var(--primary-hover)')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'var(--primary)')}
-        >
-          <Plus size={12} />
+      <div className="px-4 mb-6">
+        <button className="w-full bg-primary-container text-on-primary-container hover:bg-inverse-primary transition-all text-sm font-medium py-2 rounded-lg flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(0,112,243,0.3)]">
+          <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>add</span>
           Create Work Order
         </button>
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 overflow-y-auto py-1">
-        {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
+      {/* Nav items */}
+      <div className="flex-1 flex flex-col gap-0.5 px-2">
+        {NAV_ITEMS.map(({ label, href, icon }) => {
           const isActive = pathname === href || pathname.startsWith(href + '/')
           return (
-            <Link
-              key={href}
-              href={href}
-              className={cn(
-                'flex items-center gap-2 px-3 h-9 text-[12px] transition-colors rounded-sm mx-1 my-0.5',
-                isActive ? 'text-white font-medium' : 'hover:opacity-80'
-              )}
-              style={isActive
-                ? { background: 'var(--primary)', color: 'white' }
-                : { color: 'var(--text-3)' }
-              }
-            >
-              <Icon size={14} style={{ color: isActive ? 'white' : 'var(--text-4)' }} />
-              <span className="truncate leading-none">{label}</span>
-            </Link>
+            <motion.div key={href} whileHover={{ x: 2 }} transition={{ duration: 0.15 }}>
+              <Link
+                href={href}
+                className={cn(
+                  'flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-primary-container text-on-primary-container font-semibold'
+                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
+                )}
+              >
+                <span
+                  className="material-symbols-outlined text-[20px]"
+                  style={isActive ? { fontVariationSettings: "'FILL' 1" } : undefined}
+                >
+                  {icon}
+                </span>
+                <span>{label}</span>
+              </Link>
+            </motion.div>
           )
         })}
-      </nav>
+      </div>
 
       {/* Footer */}
-      <div className="py-2 px-1" style={{ borderTop: '1px solid var(--border)' }}>
+      <div className="mt-auto border-t border-border pt-4 flex flex-col gap-0.5 px-2">
         {[
-          { icon: Settings, label: 'Settings' },
-          { icon: HelpCircle, label: 'Support' },
-        ].map(({ icon: Icon, label }) => (
+          { label: 'Settings', icon: 'settings' },
+          { label: 'Support',  icon: 'help' },
+        ].map(({ label, icon }) => (
           <button
             key={label}
-            className="flex items-center gap-2 text-[11px] w-full px-2 h-8 rounded-sm transition-colors"
-            style={{ color: 'var(--text-3)' }}
-            onMouseEnter={e => { e.currentTarget.style.background = 'var(--surface-high)'; e.currentTarget.style.color = 'var(--text-1)' }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-3)' }}
+            className="flex items-center gap-3 px-4 py-2 rounded-lg text-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors w-full text-left"
           >
-            <Icon size={13} />
-            <span>{label}</span>
+            <span className="material-symbols-outlined text-[20px]">{icon}</span>
+            {label}
           </button>
         ))}
       </div>
-    </aside>
+    </nav>
   )
 }

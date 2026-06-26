@@ -16,7 +16,7 @@ export function ExportButton({ filename, columns, rows, disabled }: ExportButton
     <Button
       variant="secondary"
       size="sm"
-      disabled={disabled || rows.length === 0}
+      disabled={disabled}
       onClick={() => exportToCSV(filename, columns, rows)}
     >
       <Download size={13} />

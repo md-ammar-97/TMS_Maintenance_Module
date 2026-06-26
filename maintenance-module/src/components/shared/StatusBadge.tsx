@@ -1,44 +1,33 @@
 import type { DueStatus, VehicleStatus, PaymentStatus } from '@/types'
+import { cn } from '@/lib/utils'
 
-const STATUS_STYLES: Record<string, { bg: string; color: string; dot?: string }> = {
-  // Due
-  OK:       { bg: 'rgba(16,185,129,0.12)', color: '#34d399', dot: '#10b981' },
-  Upcoming: { bg: 'rgba(245,166,35,0.12)', color: '#fbbf24', dot: '#f59e0b' },
-  Overdue:  { bg: 'rgba(238,68,68,0.12)',  color: '#f87171', dot: '#ef4444' },
-  // Vehicle
-  Active:   { bg: 'rgba(16,185,129,0.12)', color: '#34d399' },
-  Inactive: { bg: 'rgba(139,144,160,0.1)', color: '#8b90a0' },
-  InShop:   { bg: 'rgba(245,166,35,0.12)', color: '#fbbf24' },
-  // Payment
-  Paid:     { bg: 'rgba(0,112,243,0.12)',  color: '#60a5fa' },
-  Pending:  { bg: 'rgba(245,166,35,0.12)', color: '#fbbf24' },
-}
-
-function Chip({ status, dot }: { status: string; dot?: boolean }) {
-  const s = STATUS_STYLES[status] ?? { bg: 'rgba(139,144,160,0.1)', color: '#8b90a0' }
+function StatusChip({ children, className, dot }: { children: React.ReactNode; className: string; dot?: string }) {
   return (
-    <span
-      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium"
-      style={{ background: s.bg, color: s.color }}
-    >
-      {dot && s.dot && <span className="w-1.5 h-1.5 rounded-full" style={{ background: s.dot }} />}
-      {status}
+    <span className={cn('inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium border', className)}>
+      {dot && <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: dot }} />}
+      {children}
     </span>
   )
 }
 
 export function DueStatusBadge({ status }: { status: DueStatus }) {
-  return <Chip status={status} dot />
+  if (status === 'OK')       return <StatusChip className="bg-success/10 text-success border-success/20" dot="#0070f3">{status}</StatusChip>
+  if (status === 'Upcoming') return <StatusChip className="bg-warning/10 text-warning border-warning/20" dot="#f5a623">{status}</StatusChip>
+  return <StatusChip className="bg-error/10 text-error border-error/20" dot="#ee0000">{status}</StatusChip>
 }
 
 export function VehicleStatusBadge({ status }: { status: VehicleStatus }) {
-  return <Chip status={status} />
+  if (status === 'Active')   return <StatusChip className="bg-success/10 text-success border-success/20">{status}</StatusChip>
+  if (status === 'InShop')   return <StatusChip className="bg-warning/10 text-warning border-warning/20">{status}</StatusChip>
+  return <StatusChip className="bg-surface-container-highest text-on-surface-variant border-outline-variant">{status}</StatusChip>
 }
 
 export function PaymentStatusBadge({ status }: { status: PaymentStatus }) {
-  return <Chip status={status} />
+  if (status === 'Paid')     return <StatusChip className="bg-success/10 text-success border-success/20">{status}</StatusChip>
+  return <StatusChip className="bg-warning/10 text-warning border-warning/20">{status}</StatusChip>
 }
 
 export function ActiveStatusBadge({ active }: { active: boolean }) {
-  return <Chip status={active ? 'Active' : 'Inactive'} dot />
+  if (active) return <StatusChip className="bg-success/10 text-success border-success/20" dot="#0070f3">Active</StatusChip>
+  return <StatusChip className="bg-surface-container-highest text-on-surface-variant border-outline-variant" dot="#8b90a0">Inactive</StatusChip>
 }

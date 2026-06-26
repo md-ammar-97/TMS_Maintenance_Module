@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Select } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
-import { generateId } from '@/lib/utils'
+import { formatCurrency, generateId, getUnitOptionLabel } from '@/lib/utils'
 import type { MaintenanceBill, MaintenanceBillLogItem, UnitType, Currency, PaymentStatus, PaymentMethod } from '@/types'
 
 interface BillModalProps {
@@ -24,6 +24,7 @@ export function BillModal({ open, onOpenChange, editItem }: BillModalProps) {
   const { vehicles, trailers, vendors, carriers, maintenanceTypes, maintenancePlans, parts, addBill, updateBill, addLog } = useApp()
 
   const [unitType, setUnitType] = useState<UnitType>('Vehicle')
+  const [billRefNumber, setBillRefNumber] = useState('')
   const [vehicleId, setVehicleId] = useState('')
   const [trailerId, setTrailerId] = useState('')
   const [vendorId, setVendorId] = useState('')
@@ -43,6 +44,7 @@ export function BillModal({ open, onOpenChange, editItem }: BillModalProps) {
     if (open) {
       if (editItem) {
         setUnitType(editItem.unitType)
+        setBillRefNumber(editItem.billRefNumber)
         setVehicleId(editItem.vehicleId ?? '')
         setTrailerId(editItem.trailerId ?? '')
         setVendorId(editItem.vendorId ?? '')
@@ -58,6 +60,7 @@ export function BillModal({ open, onOpenChange, editItem }: BillModalProps) {
         setLogItems(editItem.logItems ?? [])
       } else {
         setUnitType('Vehicle')
+        setBillRefNumber('')
         setVehicleId('')
         setTrailerId('')
         setVendorId('')
@@ -90,8 +93,8 @@ export function BillModal({ open, onOpenChange, editItem }: BillModalProps) {
     }
   }, [trailerId, trailers])
 
-  const vehicleOptions = vehicles.map(v => ({ value: v.id, label: v.vehicleNumber }))
-  const trailerOptions = trailers.map(t => ({ value: t.id, label: t.trailerNumber }))
+  const vehicleOptions = vehicles.map(v => ({ value: v.id, label: getUnitOptionLabel(v.vehicleNumber, v.status) }))
+  const trailerOptions = trailers.map(t => ({ value: t.id, label: getUnitOptionLabel(t.trailerNumber, t.status) }))
   const vendorOptions = vendors.filter(v => v.status).map(v => ({ value: v.id, label: v.name }))
   const carrierOptions = carriers.map(c => ({ value: c.id, label: c.name }))
   const typeOptions = maintenanceTypes.map(t => ({ value: t.id, label: t.name }))
@@ -112,10 +115,18 @@ export function BillModal({ open, onOpenChange, editItem }: BillModalProps) {
 
   function validate() {
     const e: Record<string, string> = {}
+    if (!billRefNumber.trim()) e.billRefNumber = 'Bill Ref Number is required'
+    if (!vendorId) e.vendorId = 'Vendor is required'
     if (unitType === 'Vehicle' && !vehicleId) e.vehicleId = 'Select a vehicle'
     if (unitType === 'Trailer' && !trailerId) e.trailerId = 'Select a trailer'
+    if (unitType === 'Vehicle' && (!mileage || isNaN(Number(mileage)) || Number(mileage) < 0)) e.mileage = 'Mileage is required for vehicles'
     if (!billDate) e.billDate = 'Bill date required'
     if (logItems.length === 0) e.items = 'Add at least one line item'
+    logItems.forEach((item, index) => {
+      if (!item.amount || Number(item.amount) <= 0) e.items = `Line item ${index + 1} needs an amount`
+      if (item.logType === 'Service' && !item.maintenanceTypeId) e.items = `Line item ${index + 1} needs a maintenance type`
+      if (item.logType === 'Part' && !item.partId) e.items = `Line item ${index + 1} needs a part`
+    })
     return e
   }
 
@@ -123,20 +134,19 @@ export function BillModal({ open, onOpenChange, editItem }: BillModalProps) {
     const e = validate()
     if (Object.keys(e).length) { setErrors(e); return }
 
-    const billRef = `BILL-${Date.now().toString().slice(-6)}`
     const payload: Omit<MaintenanceBill, 'id' | 'createdAt'> = {
-      billRefNumber: editItem?.billRefNumber ?? billRef,
+      billRefNumber: billRefNumber.trim(),
       unitType,
       vehicleId: unitType === 'Vehicle' ? vehicleId : undefined,
       trailerId: unitType === 'Trailer' ? trailerId : undefined,
-      vendorId: vendorId || undefined,
+      vendorId,
       carrierId: carrierId || undefined,
       billDate,
       currency,
       totalAmount,
       paymentStatus,
       paymentMethod: paymentMethod || undefined,
-      mileage: mileage ? Number(mileage) : undefined,
+      mileage: unitType === 'Vehicle' && mileage ? Number(mileage) : undefined,
       location: location || undefined,
       description: description || undefined,
       workCompletedDate: workCompletedDate || undefined,
@@ -149,16 +159,19 @@ export function BillModal({ open, onOpenChange, editItem }: BillModalProps) {
       toast.success('Bill updated')
     } else {
       const newBill = addBill(payload)
+      const linkedLogIds: string[] = []
       // Auto-create a log entry for each line item
       logItems.forEach(item => {
-        addLog({
+        const part = item.partId ? parts.find(p => p.id === item.partId) : undefined
+        const newLog = addLog({
           unitType,
           vehicleId: unitType === 'Vehicle' ? vehicleId : undefined,
           trailerId: unitType === 'Trailer' ? trailerId : undefined,
-          maintenanceTypeId: item.maintenanceTypeId,
+          maintenanceTypeId: item.maintenanceTypeId ?? '',
+          externalMaintenanceType: item.logType === 'Part' ? part?.name ?? 'Part' : undefined,
           maintenancePlanId: item.maintenancePlanId,
-          vendorId: vendorId || undefined,
-          mileage: mileage ? Number(mileage) : undefined,
+          vendorId,
+          mileage: unitType === 'Vehicle' && mileage ? Number(mileage) : undefined,
           serviceDate: billDate,
           currency,
           amount: Number(item.amount) || 0,
@@ -167,7 +180,9 @@ export function BillModal({ open, onOpenChange, editItem }: BillModalProps) {
           billId: newBill.id,
           createdBy: 'demo',
         })
+        linkedLogIds.push(newLog.id)
       })
+      updateBill(newBill.id, { linkedLogIds })
       toast.success('Bill added and logs created')
     }
     onOpenChange(false)
@@ -180,12 +195,30 @@ export function BillModal({ open, onOpenChange, editItem }: BillModalProps) {
 
           {/* Unit type */}
           <div>
+            <Label required>Bill Ref Number</Label>
+            <Input
+              value={billRefNumber}
+              onChange={e => setBillRefNumber(e.target.value)}
+              placeholder="e.g. BILL-V004"
+              error={errors.billRefNumber}
+            />
+          </div>
+
+          {/* Unit type */}
+          <div>
             <Label>Unit Type</Label>
             <div className="flex gap-2">
               {(['Vehicle', 'Trailer'] as UnitType[]).map(t => (
                 <button
                   key={t}
-                  onClick={() => setUnitType(t)}
+                  onClick={() => {
+                    setUnitType(t)
+                    if (t === 'Vehicle') setTrailerId('')
+                    if (t === 'Trailer') {
+                      setVehicleId('')
+                      setMileage('')
+                    }
+                  }}
                   className={`flex-1 h-9 text-sm rounded border transition-colors font-medium ${unitType === t ? 'border-primary-container bg-primary-container/10 text-primary-container' : 'border-border bg-transparent text-on-surface-variant hover:border-outline hover:text-on-surface'}`}
                 >
                   {t}
@@ -214,8 +247,8 @@ export function BillModal({ open, onOpenChange, editItem }: BillModalProps) {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Vendor</Label>
-              <Select value={vendorId} onValueChange={setVendorId} options={vendorOptions} placeholder="Select vendor" />
+              <Label required>Vendor</Label>
+              <Select value={vendorId} onValueChange={setVendorId} options={vendorOptions} placeholder="Select vendor" error={errors.vendorId} />
             </div>
             <div>
               <Label required>Bill Date</Label>
@@ -231,7 +264,7 @@ export function BillModal({ open, onOpenChange, editItem }: BillModalProps) {
             {unitType === 'Vehicle' && (
               <div>
                 <Label>Mileage</Label>
-                <Input value={mileage} onChange={e => setMileage(e.target.value)} type="number" placeholder="e.g. 312000" />
+                <Input value={mileage} onChange={e => setMileage(e.target.value)} type="number" min={0} placeholder="e.g. 312000" error={errors.mileage} />
               </div>
             )}
           </div>
@@ -333,7 +366,7 @@ export function BillModal({ open, onOpenChange, editItem }: BillModalProps) {
 
             {logItems.length > 0 && (
               <div className="flex justify-end mt-2 text-sm font-semibold text-on-surface font-mono">
-                Total: {currency} {totalAmount.toFixed(2)}
+                Total: {formatCurrency(totalAmount, currency)}
               </div>
             )}
           </div>

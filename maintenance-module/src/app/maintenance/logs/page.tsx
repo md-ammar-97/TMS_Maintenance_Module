@@ -1,256 +1,276 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { useApp } from '@/context/AppContext'
-import { RowActionsMenu } from '@/components/shared/RowActionsMenu'
 import { ConfirmDeleteDialog } from '@/components/shared/ConfirmDeleteDialog'
-import { formatCurrency, formatDate, cn } from '@/lib/utils'
+import { ExportButton } from '@/components/shared/ExportButton'
+import { RowActionsMenu } from '@/components/shared/RowActionsMenu'
+import { useApp } from '@/context/AppContext'
+import { cn, formatCurrency, formatDate, formatEmpty, formatMileage, getUnitOptionLabel } from '@/lib/utils'
 import { LogModal } from './LogModal'
 import type { MaintenanceLog } from '@/types'
 
 const ROWS_PER_PAGE = 10
 
+function StatusPill({ mapped }: { mapped: boolean }) {
+  return (
+    <span className={cn(
+      'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold',
+      mapped ? 'border-primary/20 bg-primary/10 text-primary' : 'border-border bg-surface-container-high text-on-surface-variant'
+    )}>
+      {mapped ? 'Mapped' : 'UnMapped'}
+    </span>
+  )
+}
+
 export default function LogsPage() {
-  const { maintenanceLogs, maintenanceTypes, vehicles, trailers, deleteLog } = useApp()
+  const {
+    maintenanceLogs,
+    maintenanceTypes,
+    maintenancePlans,
+    carriers,
+    vehicles,
+    trailers,
+    vendors,
+    deleteLog,
+  } = useApp()
   const [tab, setTab] = useState<'vehicle' | 'trailer'>('vehicle')
-  const [typeFilter, setTypeFilter] = useState('all')
   const [search, setSearch] = useState('')
-  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [typeFilter, setTypeFilter] = useState('all')
+  const [planFilter, setPlanFilter] = useState('all')
+  const [carrierFilter, setCarrierFilter] = useState('all')
+  const [unitFilter, setUnitFilter] = useState('all')
   const [modalOpen, setModalOpen] = useState(false)
   const [editLog, setEditLog] = useState<MaintenanceLog | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [page, setPage] = useState(1)
 
-  const filtered = useMemo(() => {
-    let rows = maintenanceLogs
-    if (tab === 'vehicle') rows = rows.filter(l => l.unitType === 'Vehicle')
-    if (tab === 'trailer') rows = rows.filter(l => l.unitType === 'Trailer')
-    if (typeFilter !== 'all') rows = rows.filter(l => l.maintenanceTypeId === typeFilter)
-    if (search) rows = rows.filter(l => l.description?.toLowerCase().includes(search.toLowerCase()))
-    return rows
-  }, [maintenanceLogs, tab, typeFilter, search])
-
-  const totalAmount = filtered.reduce((sum, l) => sum + (l.amount ?? 0), 0)
-  const totalPages = Math.max(1, Math.ceil(filtered.length / ROWS_PER_PAGE))
-  const paged = filtered.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE)
-
-  function getUnitNum(log: MaintenanceLog) {
+  function getUnit(log: MaintenanceLog) {
+    return log.unitType === 'Vehicle'
+      ? vehicles.find(v => v.id === log.vehicleId)
+      : trailers.find(t => t.id === log.trailerId)
+  }
+  function getUnitNumber(log: MaintenanceLog) {
     if (log.unitType === 'Vehicle') return vehicles.find(v => v.id === log.vehicleId)?.vehicleNumber ?? log.vehicleId ?? '—'
     return trailers.find(t => t.id === log.trailerId)?.trailerNumber ?? log.trailerId ?? '—'
   }
-
+  function getCarrierId(log: MaintenanceLog) {
+    return getUnit(log)?.carrierId ?? ''
+  }
+  function getCarrierName(log: MaintenanceLog) {
+    const carrierId = getCarrierId(log)
+    return carriers.find(c => c.id === carrierId)?.name ?? '—'
+  }
   function getTypeName(log: MaintenanceLog) {
-    if (log.externalMaintenanceType) return log.externalMaintenanceType
-    if (log.maintenanceTypeId) return maintenanceTypes.find(t => t.id === log.maintenanceTypeId)?.name ?? '—'
-    return 'General'
+    if (log.maintenanceTypeId) return maintenanceTypes.find(t => t.id === log.maintenanceTypeId)?.name ?? 'Unknown Type'
+    return 'Unknown Type'
+  }
+  function getPlanName(log: MaintenanceLog) {
+    return log.maintenancePlanId ? maintenancePlans.find(p => p.id === log.maintenancePlanId)?.name ?? 'Unknown Plan' : '—'
+  }
+  function getVendorName(log: MaintenanceLog) {
+    return log.vendorId ? vendors.find(v => v.id === log.vendorId)?.name ?? 'Unknown Vendor' : '—'
   }
 
-  function getTypeBadgeClass(typeId?: string) {
-    if (!typeId) return 'bg-surface-container-highest text-on-surface-variant border border-outline-variant'
-    return 'bg-success/10 text-success border border-success/20'
-  }
+  const unitOptions = tab === 'vehicle'
+    ? vehicles.map(v => ({ id: v.id, number: getUnitOptionLabel(v.vehicleNumber, v.status) }))
+    : trailers.map(t => ({ id: t.id, number: getUnitOptionLabel(t.trailerNumber, t.status) }))
 
-  const TABS = [{ key: 'vehicle', label: 'Vehicle' }, { key: 'trailer', label: 'Trailer' }] as const
+  const filtered = useMemo(() => {
+    return maintenanceLogs
+      .filter(log => tab === 'vehicle' ? log.unitType === 'Vehicle' : log.unitType === 'Trailer')
+      .filter(log => statusFilter === 'all' || (statusFilter === 'mapped' ? Boolean(log.billId) : !log.billId))
+      .filter(log => typeFilter === 'all' || log.maintenanceTypeId === typeFilter)
+      .filter(log => planFilter === 'all' || log.maintenancePlanId === planFilter)
+      .filter(log => carrierFilter === 'all' || getCarrierId(log) === carrierFilter)
+      .filter(log => unitFilter === 'all' || log.vehicleId === unitFilter || log.trailerId === unitFilter)
+      .filter(log => {
+        if (!search) return true
+        const haystack = [
+          getTypeName(log),
+          log.externalMaintenanceType,
+          getPlanName(log),
+          getUnitNumber(log),
+          getCarrierName(log),
+          getVendorName(log),
+          log.description,
+          log.billRefNumber,
+          log.createdBy,
+        ].join(' ').toLowerCase()
+        return haystack.includes(search.toLowerCase())
+      })
+  }, [maintenanceLogs, tab, statusFilter, typeFilter, planFilter, carrierFilter, unitFilter, search, maintenanceTypes, maintenancePlans, carriers, vehicles, trailers, vendors])
+
+  const totalAmount = filtered.reduce((sum, log) => sum + (log.amount || 0), 0)
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ROWS_PER_PAGE))
+  const paged = filtered.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE)
+
+  const exportRows = filtered.map(log => ({
+    MaintenanceType: getTypeName(log),
+    ExternalMaintenanceType: log.externalMaintenanceType ?? '',
+    PlanName: getPlanName(log),
+    TirePosition: log.tirePosition ?? '',
+    UnitNumber: getUnitNumber(log),
+    Carrier: getCarrierName(log),
+    Vendor: getVendorName(log),
+    ServiceDate: log.serviceDate,
+    Mileage: log.mileage ?? '',
+    Amount: log.amount,
+    Description: log.description ?? '',
+    CreatedBy: log.createdBy,
+    BillRefNumber: log.billRefNumber ?? '',
+    LogStatus: log.billId ? 'Mapped' : 'UnMapped',
+    Currency: log.currency,
+    GST: log.gst ?? '',
+    HST: log.hst ?? '',
+    QST: log.qst ?? '',
+  }))
+
+  function clearFilters() {
+    setSearch('')
+    setStatusFilter('all')
+    setTypeFilter('all')
+    setPlanFilter('all')
+    setCarrierFilter('all')
+    setUnitFilter('all')
+    setPage(1)
+  }
 
   return (
-    <div className="flex flex-col h-full relative">
-      {/* Overlay for drawer */}
-      <AnimatePresence>
-        {drawerOpen && (
-          <motion.div
-            key="overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/40 z-30"
-            onClick={() => setDrawerOpen(false)}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Advanced Filters Drawer */}
-      <AnimatePresence>
-        {drawerOpen && (
-          <motion.div
-            key="drawer"
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 h-full w-80 bg-surface-container-lowest border-l border-border z-40 flex flex-col"
-          >
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-              <h3 className="text-sm font-semibold text-on-surface">Advanced Filters</h3>
-              <button onClick={() => setDrawerOpen(false)} className="p-1 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors">
-                <span className="material-symbols-outlined text-[20px]">close</span>
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-5 space-y-5">
-              <div>
-                <label className="text-xs font-medium uppercase tracking-wide text-on-surface-variant font-mono block mb-2">Date Range</label>
-                <div className="flex gap-2">
-                  <input type="date" className="flex-1 h-9 px-3 rounded border bg-surface-container-low border-border text-on-surface text-sm outline-none focus:border-primary" />
-                  <input type="date" className="flex-1 h-9 px-3 rounded border bg-surface-container-low border-border text-on-surface text-sm outline-none focus:border-primary" />
-                </div>
-              </div>
-              <div>
-                <label className="text-xs font-medium uppercase tracking-wide text-on-surface-variant font-mono block mb-2">Carrier</label>
-                <select className="w-full h-9 px-3 rounded border bg-surface-container-low border-border text-on-surface text-sm outline-none focus:border-primary">
-                  <option>All Carriers</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-xs font-medium uppercase tracking-wide text-on-surface-variant font-mono block mb-2">Amount Range</label>
-                <div className="flex gap-2">
-                  <input placeholder="Min" type="number" className="flex-1 h-9 px-3 rounded border bg-surface-container-low border-border text-on-surface text-sm outline-none focus:border-primary placeholder:text-outline" />
-                  <input placeholder="Max" type="number" className="flex-1 h-9 px-3 rounded border bg-surface-container-low border-border text-on-surface text-sm outline-none focus:border-primary placeholder:text-outline" />
-                </div>
-              </div>
-            </div>
-            <div className="p-4 border-t border-border flex gap-2">
-              <button className="flex-1 border border-border text-on-surface-variant py-2 rounded text-sm hover:bg-surface-container-low transition-colors">Clear</button>
-              <button className="flex-1 bg-primary-container text-on-primary-container py-2 rounded text-sm font-medium hover:bg-inverse-primary transition-colors">Apply</button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
+    <div className="flex h-full flex-col">
       <div className="p-6">
-        <div className="flex items-center justify-between mb-5">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-semibold text-on-surface">Maintenance Logs</h2>
-            <p className="text-sm text-on-surface-variant mt-0.5">Track and review all maintenance activities.</p>
+            <h2 className="text-2xl font-semibold text-on-surface">Logs</h2>
+            <p className="mt-0.5 text-sm text-on-surface-variant">Track maintenance work across vehicles and trailers.</p>
           </div>
-          <div className="flex items-center gap-3">
-            {/* Total Amount card */}
-            <div className="bg-surface-container-low border border-border rounded px-4 py-2 text-right">
-              <div className="text-xs text-on-surface-variant font-mono">Total Amount</div>
-              <div className="text-sm font-semibold text-on-surface font-mono">{formatCurrency(totalAmount)}</div>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="rounded border border-border bg-surface-container-low px-4 py-2 text-right">
+              <div className="font-mono text-xs text-on-surface-variant">Total Amount</div>
+              <div className="font-mono text-sm font-semibold text-on-surface">{formatCurrency(totalAmount)}</div>
             </div>
-            <button
-              onClick={() => { setEditLog(null); setModalOpen(true) }}
-              className="bg-primary-container text-on-primary-container hover:bg-inverse-primary transition-colors py-2 px-4 rounded font-medium text-sm flex items-center gap-2"
-            >
-              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>add</span>
-              Add Log
+            <button onClick={() => toast.info('PullRay Integration Logs are not available in this prototype.')} className="rounded border border-border px-4 py-2 text-sm text-on-surface-variant hover:bg-surface-container-low">
+              PullRay Integration Logs
+            </button>
+            <button onClick={() => { setEditLog(null); setModalOpen(true) }} className="inline-flex items-center gap-2 rounded bg-primary-container px-4 py-2 text-sm font-medium text-on-primary-container hover:bg-inverse-primary">
+              <span className="material-symbols-outlined text-[18px]">add</span>
+              Create new maintenance log
             </button>
           </div>
         </div>
 
-        {/* Tabs + Filters */}
-        <div className="flex flex-wrap items-center gap-3 mb-0">
-          <div className="flex gap-1 p-1 bg-surface-container rounded-lg">
-            {TABS.map(t => (
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex rounded bg-surface-container-high p-1">
+            {(['vehicle', 'trailer'] as const).map(value => (
               <button
-                key={t.key}
-                onClick={() => { setTab(t.key); setPage(1) }}
-                className={cn(
-                  'px-5 py-1.5 rounded text-sm font-medium transition-colors',
-                  tab === t.key
-                    ? 'bg-surface-container-highest text-on-surface border border-border shadow-sm'
-                    : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'
-                )}
+                key={value}
+                onClick={() => { setTab(value); setUnitFilter('all'); setPage(1) }}
+                className={cn('rounded px-5 py-1.5 text-sm font-medium capitalize', tab === value ? 'bg-surface text-on-surface shadow-sm' : 'text-on-surface-variant')}
               >
-                {t.label}
+                {value}
               </button>
             ))}
           </div>
-          <select
-            value={typeFilter}
-            onChange={e => { setTypeFilter(e.target.value); setPage(1) }}
-            className="h-9 px-3 pr-8 text-sm rounded border bg-surface-container-low border-border text-on-surface outline-none focus:border-primary transition-colors"
-          >
-            <option value="all">All Types</option>
-            {maintenanceTypes.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-          </select>
           <div className="relative">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[16px]">search</span>
-            <input
-              value={search}
-              onChange={e => { setSearch(e.target.value); setPage(1) }}
-              placeholder="Search..."
-              className="h-9 pl-9 pr-4 text-sm rounded border bg-surface-container-low border-border text-on-surface placeholder:text-outline outline-none focus:border-primary w-44"
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[16px] text-on-surface-variant">search</span>
+            <input value={search} onChange={e => { setSearch(e.target.value); setPage(1) }} placeholder="Search logs..." className="h-9 w-56 rounded border border-border bg-surface-container-low pl-9 pr-3 text-sm text-on-surface outline-none focus:border-primary" />
+          </div>
+          <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1) }} className="h-9 rounded border border-border bg-surface-container-low px-3 text-sm text-on-surface">
+            <option value="all">All Statuses</option>
+            <option value="mapped">Mapped</option>
+            <option value="unmapped">UnMapped</option>
+          </select>
+          <select value={typeFilter} onChange={e => { setTypeFilter(e.target.value); setPage(1) }} className="h-9 rounded border border-border bg-surface-container-low px-3 text-sm text-on-surface">
+            <option value="all">All Types</option>
+            {maintenanceTypes.map(type => <option key={type.id} value={type.id}>{type.name}</option>)}
+          </select>
+          <select value={planFilter} onChange={e => { setPlanFilter(e.target.value); setPage(1) }} className="h-9 rounded border border-border bg-surface-container-low px-3 text-sm text-on-surface">
+            <option value="all">All Plans</option>
+            {maintenancePlans.map(plan => <option key={plan.id} value={plan.id}>{plan.name}</option>)}
+          </select>
+          <select value={carrierFilter} onChange={e => { setCarrierFilter(e.target.value); setPage(1) }} className="h-9 rounded border border-border bg-surface-container-low px-3 text-sm text-on-surface">
+            <option value="all">All Carriers</option>
+            {carriers.map(carrier => <option key={carrier.id} value={carrier.id}>{carrier.name}</option>)}
+          </select>
+          <select value={unitFilter} onChange={e => { setUnitFilter(e.target.value); setPage(1) }} className="h-9 rounded border border-border bg-surface-container-low px-3 text-sm text-on-surface">
+            <option value="all">All {tab === 'vehicle' ? 'Vehicles' : 'Trailers'}</option>
+            {unitOptions.map(unit => <option key={unit.id} value={unit.id}>{unit.number}</option>)}
+          </select>
+          <button onClick={clearFilters} className="h-9 rounded border border-border px-3 text-sm text-on-surface-variant hover:bg-surface-container-high">Clear</button>
+          <div className="ml-auto">
+            <ExportButton
+              filename="maintenance-logs"
+              columns={['MaintenanceType', 'ExternalMaintenanceType', 'PlanName', 'TirePosition', 'UnitNumber', 'Carrier', 'Vendor', 'ServiceDate', 'Mileage', 'Amount', 'Description', 'CreatedBy', 'BillRefNumber', 'LogStatus', 'Currency', 'GST', 'HST', 'QST']}
+              rows={exportRows}
             />
           </div>
-          <button
-            onClick={() => setDrawerOpen(true)}
-            className="flex items-center gap-1 h-9 px-3 border border-border rounded text-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors ml-auto"
-          >
-            <span className="material-symbols-outlined text-[16px]">tune</span>
-            Advanced
-          </button>
         </div>
       </div>
 
-      {/* Table */}
-      <div className="flex-1 overflow-auto mx-6 mb-6 bg-surface rounded-lg border border-border overflow-hidden">
+      <div className="mx-6 mb-6 flex-1 overflow-hidden rounded-lg border border-border bg-surface">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse whitespace-nowrap">
+          <table className="w-full min-w-[1500px] border-collapse text-left text-sm">
             <thead>
-              <tr className="bg-surface-container-low border-b border-border">
-                {['Type', 'Unit No.', 'Date', 'Mileage', 'Amount', 'Description', 'Actions'].map(h => (
-                  <th key={h} className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-on-surface-variant font-mono">{h}</th>
+              <tr className="border-b border-border bg-surface-container-low">
+                {['Actions', 'Unit #', 'Carrier', 'Vendor', 'Maintenance Type', 'External Type', 'Plan Name', 'Tire Position', 'Service Date', 'Mileage', 'Amount', 'Description', 'Created By', 'Bill Ref Number', 'Log Status', 'Currency', 'GST', 'HST', 'QST'].map(header => (
+                  <th key={header} className={cn('px-4 py-3 text-xs font-medium uppercase tracking-wider text-on-surface-variant', ['Mileage', 'Amount', 'GST', 'HST', 'QST'].includes(header) && 'text-right')}>{header}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-border text-sm">
+            <tbody className="divide-y divide-border">
               {paged.length === 0 ? (
-                <tr><td colSpan={7} className="px-4 py-12 text-center text-sm text-outline">No logs found.</td></tr>
-              ) : (
-                paged.map((log, i) => (
-                  <motion.tr
-                    key={log.id}
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.15, delay: i * 0.02 }}
-                    className="group hover:bg-surface-container-lowest/50 transition-colors"
-                  >
-                    <td className="px-4 py-3">
-                      <span className={cn('inline-flex items-center px-2 py-0.5 rounded text-xs font-medium', getTypeBadgeClass(log.maintenanceTypeId))}>
-                        {getTypeName(log)}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 font-mono text-xs text-on-surface font-medium">{getUnitNum(log)}</td>
-                    <td className="px-4 py-3 text-on-surface-variant">{formatDate(log.serviceDate)}</td>
-                    <td className="px-4 py-3 text-right font-mono text-xs text-on-surface-variant">{log.mileage?.toLocaleString() ?? '—'}</td>
-                    <td className="px-4 py-3 text-right font-mono text-xs text-on-surface">{formatCurrency(log.amount ?? 0)}</td>
-                    <td className="px-4 py-3 text-on-surface-variant truncate max-w-[200px]">{log.description || '—'}</td>
-                    <td className="px-4 py-3">
-                      <RowActionsMenu
-                        onEdit={() => { setEditLog(log); setModalOpen(true) }}
-                        onDelete={() => setDeleteId(log.id)}
-                      />
-                    </td>
-                  </motion.tr>
-                ))
-              )}
+                <tr><td colSpan={19} className="px-4 py-16 text-center text-sm text-outline">No logs found. Try adjusting your filters.</td></tr>
+              ) : paged.map(log => (
+                <tr key={log.id} className="group hover:bg-surface-container-low">
+                  <td className="px-4 py-3">
+                    <RowActionsMenu
+                      onEdit={() => { setEditLog(log); setModalOpen(true) }}
+                      onDelete={() => setDeleteId(log.id)}
+                    />
+                  </td>
+                  <td className="px-4 py-3 font-mono text-xs font-semibold text-on-surface">{getUnitNumber(log)}</td>
+                  <td className="px-4 py-3 text-on-surface-variant">{getCarrierName(log)}</td>
+                  <td className="px-4 py-3 text-on-surface-variant">{getVendorName(log)}</td>
+                  <td className="px-4 py-3"><span className="rounded bg-success/10 px-2 py-0.5 text-xs font-semibold text-success">{getTypeName(log)}</span></td>
+                  <td className="px-4 py-3 text-on-surface-variant">{formatEmpty(log.externalMaintenanceType)}</td>
+                  <td className="px-4 py-3 text-on-surface-variant">{getPlanName(log)}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-on-surface-variant">{formatEmpty(log.tirePosition)}</td>
+                  <td className="px-4 py-3 text-on-surface-variant">{formatDate(log.serviceDate)}</td>
+                  <td className="px-4 py-3 text-right font-mono text-xs text-on-surface-variant">{formatMileage(log.mileage)}</td>
+                  <td className="px-4 py-3 text-right font-mono text-xs font-semibold text-on-surface">{formatCurrency(log.amount, log.currency)}</td>
+                  <td className="max-w-[240px] truncate px-4 py-3 text-on-surface-variant" title={log.description}>{formatEmpty(log.description)}</td>
+                  <td className="px-4 py-3 text-on-surface-variant">{log.createdBy}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-on-surface">{formatEmpty(log.billRefNumber)}</td>
+                  <td className="px-4 py-3"><StatusPill mapped={Boolean(log.billId)} /></td>
+                  <td className="px-4 py-3 text-on-surface-variant">{log.currency}</td>
+                  <td className="px-4 py-3 text-right font-mono text-xs text-on-surface-variant">{formatEmpty(log.gst)}</td>
+                  <td className="px-4 py-3 text-right font-mono text-xs text-on-surface-variant">{formatEmpty(log.hst)}</td>
+                  <td className="px-4 py-3 text-right font-mono text-xs text-on-surface-variant">{formatEmpty(log.qst)}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
-
-        <div className="p-4 border-t border-border flex justify-between items-center bg-surface-container-lowest">
-          <span className="text-xs text-on-surface-variant font-mono">
+        <div className="flex items-center justify-between border-t border-border bg-surface-container-lowest p-4">
+          <span className="font-mono text-xs text-on-surface-variant">
             Showing {filtered.length === 0 ? 0 : (page - 1) * ROWS_PER_PAGE + 1} to {Math.min(page * ROWS_PER_PAGE, filtered.length)} of {filtered.length} entries
           </span>
           <div className="flex gap-1">
-            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="p-1 border border-border rounded text-on-surface-variant hover:bg-surface hover:text-on-surface transition-colors disabled:opacity-40">
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="rounded border border-border p-1 text-on-surface-variant disabled:opacity-40">
               <span className="material-symbols-outlined text-[20px]">chevron_left</span>
             </button>
-            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="p-1 border border-border rounded text-on-surface-variant hover:bg-surface hover:text-on-surface transition-colors disabled:opacity-40">
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="rounded border border-border p-1 text-on-surface-variant disabled:opacity-40">
               <span className="material-symbols-outlined text-[20px]">chevron_right</span>
             </button>
           </div>
         </div>
       </div>
 
-      <LogModal open={modalOpen} onOpenChange={v => { setModalOpen(v); if (!v) setEditLog(null) }} editItem={editLog} />
-
+      <LogModal open={modalOpen} onOpenChange={open => { setModalOpen(open); if (!open) setEditLog(null) }} editItem={editLog} />
       <ConfirmDeleteDialog
         open={!!deleteId}
-        onOpenChange={v => !v && setDeleteId(null)}
+        onOpenChange={open => !open && setDeleteId(null)}
         onConfirm={() => { if (deleteId) { deleteLog(deleteId); toast.success('Log deleted') } }}
         title="Delete Log"
         description="This maintenance log will be permanently deleted."

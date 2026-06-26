@@ -12,7 +12,7 @@ export function DropdownMenuContent({ children, className, ...props }: RadixDrop
   return (
     <RadixDropdown.Portal>
       <RadixDropdown.Content
-        className={cn('dropdown-content z-50 min-w-[160px]', className)}
+        className={cn('dropdown-content z-50 min-w-[160px] py-1', className)}
         sideOffset={4}
         {...props}
       >
@@ -24,23 +24,22 @@ export function DropdownMenuContent({ children, className, ...props }: RadixDrop
 
 interface DropdownMenuItemProps extends RadixDropdown.DropdownMenuItemProps {
   destructive?: boolean
-  icon?: React.ReactNode
+  icon?: string
 }
 
 export function DropdownMenuItem({ children, className, destructive, icon, ...props }: DropdownMenuItemProps) {
   return (
     <RadixDropdown.Item
       className={cn(
-        'flex items-center gap-2 px-3 py-2 text-[13px] cursor-pointer outline-none transition-colors',
-        destructive ? 'text-red-500' : '',
+        'flex items-center gap-2 px-3 py-2 text-sm cursor-pointer outline-none transition-colors',
+        destructive
+          ? 'text-error hover:bg-error/10'
+          : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface',
         className
       )}
-      style={destructive ? undefined : { color: 'var(--text-2)' }}
-      onMouseEnter={e => (e.currentTarget.style.background = destructive ? 'rgba(239,68,68,0.1)' : 'var(--surface-high)')}
-      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
       {...props}
     >
-      {icon && <span style={{ color: destructive ? undefined : 'var(--text-4)' }}>{icon}</span>}
+      {icon && <span className="material-symbols-outlined text-[16px]">{icon}</span>}
       {children}
     </RadixDropdown.Item>
   )

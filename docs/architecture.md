@@ -1,5 +1,7 @@
 # Architecture — Maintenance Module Frontend Prototype
 
+> **Design system:** **Uber Base**, light-first with dark parity, modeled as a Figma token library (Primitives → Semantic → Component). See `design.md`. The component library below (shadcn/ui + Tailwind) is **themed entirely by Base tokens** — components read CSS variables, never raw colors.
+
 ---
 
 ## 1. OVERVIEW
@@ -14,8 +16,8 @@ This is a **frontend-only prototype** of a Maintenance Module for an existing Tr
 |-------|--------|--------|
 | Framework | Next.js 14 (App Router) | Vercel-native, file-based routing, no server required for static export |
 | Language | TypeScript | Type safety across shared data models |
-| Styling | Tailwind CSS | Utility-first, fast to build enterprise UI |
-| UI Components | shadcn/ui | Accessible, unstyled-by-default components (dialogs, drawers, dropdowns, tables, tabs, toasts) |
+| Styling | Tailwind CSS (themed by Uber Base tokens) | Utility-first; all colors/spacing come from Base design tokens exposed as CSS variables — no hardcoded color utilities |
+| UI Components | shadcn/ui | Accessible Radix primitives (dialogs, drawers, dropdowns, tables, tabs, toasts), restyled with Base tokens. *(Alternative: Base Web `baseui` — not required for the prototype; would replace shadcn but adds migration cost.)* |
 | Icons | Lucide React | Consistent icon set used by shadcn |
 | State Management | React Context + `sessionStorage` | Shared cross-page state; resets on tab close |
 | Date Picker | react-day-picker (via shadcn) | Lightweight, no external dependency on heavy libs |
@@ -226,13 +228,14 @@ Advanced filter drawers use `shadcn/ui Sheet` (right-side slide-in). Filter stat
 ### 7.3 Table Pattern
 
 `DataTable.tsx` is a generic wrapper accepting:
-- `columns: ColumnDef[]`
+- `columns: ColumnDef[]` (each column declares its **encoding** — badge / category-chip / avatar / mono-number / date / plain — per `design.md §9`)
 - `data: T[]`
 - `onRowAction: (action: string, row: T) => void`
 - `visibleColumns: string[]` (for column customization)
 - `rowsPerPageOptions: number[]`
+- `density: 'comfortable' | 'compact'`
 
-Each page builds its own column definitions and passes them to `DataTable`.
+The table card owns its **horizontal + vertical scroll**; the leading anchor column and the trailing Actions column are **sticky** so wide tables never push the page sideways and the row menu is always reachable (`design.md §9.6, §11.4, §12.4`). Each page builds its own column definitions and passes them to `DataTable`.
 
 ### 7.4 Three-dot Row Action Menu
 
@@ -241,6 +244,10 @@ Uses `shadcn/ui DropdownMenu`. Each row renders a `MoreHorizontal` icon button t
 ### 7.5 Tab Pattern
 
 Vehicle/Trailer tabs on Logs, Bills, and Inspection use `shadcn/ui Tabs`. The active tab controls which dataset is shown and which dropdown labels appear (Vehicle Number vs Trailer Number).
+
+### 7.6 Layout / Anti-Overlap Pattern
+
+The main content column uses `min-width: 0` so flex children can shrink (without it, a wide table forces page-level horizontal overflow). Filter bars are `flex-wrap` rows whose controls wrap to a second line instead of overlapping, and collapse behind a "Filters" button below `xl`. Modals use a pinned header/footer with a scrolling body (`max-height: calc(100vh - 96px)`), so the dynamic Bill log-items list never pushes the footer off-screen. Row action menus render in a z-1000 portal with collision-aware placement. Full spec: `design.md §10–§12`.
 
 ---
 
@@ -334,4 +341,5 @@ vercel deploy
 | No real PDF | Inspection annual report opens `window.print()` or a static mock page |
 | No real Excel | CSV export only |
 | Session-only data | `sessionStorage` (not `localStorage`) so data resets on tab close |
+| Theme | **Light by default**, dark as parity toggle; preference in `localStorage`; all surfaces read Base semantic tokens (no hardcoded colors) |
 | Seed on first load | Check for `__seeded` flag in `sessionStorage`; seed once per session |

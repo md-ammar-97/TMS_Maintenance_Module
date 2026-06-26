@@ -1,79 +1,50 @@
 'use client'
 
-import { Search, Sun, Moon, Bell, ChevronDown } from 'lucide-react'
 import { useTheme } from '@/components/providers/ThemeProvider'
 
 export function TopBar() {
   const { theme, toggle } = useTheme()
 
   return (
-    <header
-      className="h-[52px] flex-shrink-0 flex items-center px-6 justify-between z-10 border-b"
-      style={{ background: 'var(--topbar-bg)', borderColor: 'var(--border)' }}
-    >
-      {/* Logo */}
-      <div>
-        <div className="text-[15px] font-bold tracking-widest" style={{ color: 'var(--text-1)' }}>AXESTRACK</div>
-        <div className="text-[9px] -mt-0.5" style={{ color: 'var(--text-4)' }}>Right Information, Great Decisions</div>
+    <header className="bg-surface flex justify-between items-center h-16 px-6 w-full sticky top-0 z-50 border-b border-border">
+      {/* Left: brand */}
+      <div className="flex items-center gap-4">
+        <button className="md:hidden text-on-surface">
+          <span className="material-symbols-outlined">menu</span>
+        </button>
+        <span className="text-2xl font-bold text-primary hidden md:block tracking-widest">AXESTRACK</span>
       </div>
 
-      {/* Search */}
-      <div className="relative mx-6 flex-1 max-w-xs">
-        <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-4)' }} />
+      {/* Center: search */}
+      <div className="relative hidden sm:block flex-1 max-w-xs mx-6">
+        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
         <input
+          className="bg-surface-container-low border border-border rounded-full py-1.5 pl-10 pr-4 text-sm text-on-surface placeholder:text-on-surface-variant w-full outline-none focus:border-primary transition-colors"
           placeholder="Search..."
-          className="h-8 w-full pl-8 pr-3 text-[12px] rounded-md border outline-none transition-colors"
-          style={{
-            background: 'var(--surface)',
-            borderColor: 'var(--border)',
-            color: 'var(--text-1)',
-          }}
+          type="text"
         />
       </div>
 
-      {/* Right actions */}
+      {/* Right: actions */}
       <div className="flex items-center gap-1">
-        {/* Theme toggle */}
         <button
           onClick={toggle}
-          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          className="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
-          style={{ color: 'var(--text-3)' }}
-          onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-high)')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+          title={theme === 'dark' ? 'Switch to light' : 'Switch to dark'}
+          className="text-on-surface-variant hover:text-on-surface transition-colors p-2 rounded-full hover:bg-surface-container-low"
         >
-          {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+          <span className="material-symbols-outlined text-[20px]">
+            {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+          </span>
         </button>
 
-        {/* Bell */}
-        <button
-          className="w-8 h-8 flex items-center justify-center rounded-full transition-colors relative"
-          style={{ color: 'var(--text-3)' }}
-          onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-high)')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-        >
-          <Bell size={16} />
-          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-red-500" />
+        <button className="text-on-surface-variant hover:text-on-surface transition-colors p-2 rounded-full hover:bg-surface-container-low relative">
+          <span className="material-symbols-outlined text-[20px]">notifications</span>
+          <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full" />
         </button>
 
-        {/* User */}
-        <button
-          className="flex items-center gap-2 ml-1 pl-2 rounded-full transition-colors"
-          onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-high)')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-        >
-          <div
-            className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[11px] font-bold"
-            style={{ background: 'var(--primary)' }}
-          >
-            D
-          </div>
-          <div className="text-left">
-            <div className="text-[12px] font-semibold leading-tight" style={{ color: 'var(--text-1)' }}>demo</div>
-            <div className="text-[10px] leading-tight" style={{ color: 'var(--text-4)' }}>Member</div>
-          </div>
-          <ChevronDown size={13} style={{ color: 'var(--text-4)' }} />
-        </button>
+        <div className="w-8 h-8 rounded-full bg-primary-container border border-border flex items-center justify-center text-on-primary-container text-xs font-bold ml-1 cursor-pointer">
+          D
+        </div>
       </div>
     </header>
   )

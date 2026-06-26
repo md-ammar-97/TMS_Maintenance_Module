@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Select } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
+import { getUnitOptionLabel } from '@/lib/utils'
 import type { MaintenanceLog, UnitType, Currency, TirePosition } from '@/types'
 
 interface LogModalProps {
@@ -18,12 +19,23 @@ interface LogModalProps {
   prefillVehicleId?: string
   prefillTrailerId?: string
   prefillPlanId?: string
+  prefillMaintenanceTypeId?: string
+  onSaved?: (log: MaintenanceLog) => void
 }
 
 const TIRE_POSITIONS: TirePosition[] = ['LFI', 'LFO', 'RFI', 'RFO', 'LRI', 'LRO', 'RRI', 'RRO', 'RS', 'LS']
 
-export function LogModal({ open, onOpenChange, editItem, prefillVehicleId, prefillTrailerId, prefillPlanId }: LogModalProps) {
-  const { vehicles, trailers, vendors, maintenanceTypes, maintenancePlans, parts, carriers, addLog, updateLog } = useApp()
+export function LogModal({
+  open,
+  onOpenChange,
+  editItem,
+  prefillVehicleId,
+  prefillTrailerId,
+  prefillPlanId,
+  prefillMaintenanceTypeId,
+  onSaved,
+}: LogModalProps) {
+  const { vehicles, trailers, vendors, maintenanceTypes, maintenancePlans, carriers, addLog, updateLog } = useApp()
 
   const [unitType, setUnitType] = useState<UnitType>('Vehicle')
   const [vehicleId, setVehicleId] = useState('')
@@ -60,8 +72,9 @@ export function LogModal({ open, onOpenChange, editItem, prefillVehicleId, prefi
         setUnitType(prefillTrailerId ? 'Trailer' : 'Vehicle')
         setVehicleId(prefillVehicleId ?? '')
         setTrailerId(prefillTrailerId ?? '')
+        const prefillPlan = prefillPlanId ? maintenancePlans.find(p => p.id === prefillPlanId) : undefined
         setMaintenancePlanId(prefillPlanId ?? '')
-        setMaintenanceTypeId('')
+        setMaintenanceTypeId(prefillMaintenanceTypeId ?? prefillPlan?.maintenanceTypeId ?? '')
         setTirePosition('')
         setVendorId('')
         setMileage('')
@@ -73,15 +86,15 @@ export function LogModal({ open, onOpenChange, editItem, prefillVehicleId, prefi
       }
       setErrors({})
     }
-  }, [open, editItem, prefillVehicleId, prefillTrailerId, prefillPlanId])
+  }, [open, editItem, prefillVehicleId, prefillTrailerId, prefillPlanId, prefillMaintenanceTypeId, maintenancePlans])
 
   const vehicleOptions = vehicles.map(v => {
     const c = carriers.find(x => x.id === v.carrierId)
-    return { value: v.id, label: `${v.vehicleNumber}${c ? ` — ${c.name}` : ''}` }
+    return { value: v.id, label: `${getUnitOptionLabel(v.vehicleNumber, v.status)}${c ? ` - ${c.name}` : ''}` }
   })
   const trailerOptions = trailers.map(t => {
     const c = carriers.find(x => x.id === t.carrierId)
-    return { value: t.id, label: `${t.trailerNumber}${c ? ` — ${c.name}` : ''}` }
+    return { value: t.id, label: `${getUnitOptionLabel(t.trailerNumber, t.status)}${c ? ` - ${c.name}` : ''}` }
   })
   const typeOptions = maintenanceTypes.map(t => ({ value: t.id, label: t.name }))
   const planOptions = maintenancePlans.filter(p => !maintenanceTypeId || p.maintenanceTypeId === maintenanceTypeId).map(p => ({ value: p.id, label: p.name }))
@@ -93,6 +106,8 @@ export function LogModal({ open, onOpenChange, editItem, prefillVehicleId, prefi
     const e: Record<string, string> = {}
     if (unitType === 'Vehicle' && !vehicleId) e.vehicleId = 'Select a vehicle'
     if (unitType === 'Trailer' && !trailerId) e.trailerId = 'Select a trailer'
+    if (!maintenanceTypeId) e.maintenanceTypeId = 'Maintenance Type is required'
+    if (unitType === 'Vehicle' && (!mileage || isNaN(Number(mileage)) || Number(mileage) < 0)) e.mileage = 'Enter vehicle mileage'
     if (!serviceDate) e.serviceDate = 'Service date required'
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) e.amount = 'Enter a valid amount'
     return e
@@ -106,11 +121,11 @@ export function LogModal({ open, onOpenChange, editItem, prefillVehicleId, prefi
       unitType,
       vehicleId: unitType === 'Vehicle' ? vehicleId : undefined,
       trailerId: unitType === 'Trailer' ? trailerId : undefined,
-      maintenanceTypeId: maintenanceTypeId || undefined,
+      maintenanceTypeId,
       maintenancePlanId: maintenancePlanId || undefined,
       tirePosition: (isTireType && tirePosition) ? tirePosition as TirePosition : undefined,
       vendorId: vendorId || undefined,
-      mileage: mileage ? Number(mileage) : undefined,
+      mileage: unitType === 'Vehicle' && mileage ? Number(mileage) : undefined,
       serviceDate,
       currency,
       amount: Number(amount),
@@ -121,9 +136,11 @@ export function LogModal({ open, onOpenChange, editItem, prefillVehicleId, prefi
 
     if (editItem) {
       updateLog(editItem.id, payload)
+      onSaved?.({ ...editItem, ...payload })
       toast.success('Log updated')
     } else {
-      addLog(payload)
+      const newLog = addLog(payload)
+      onSaved?.(newLog)
       toast.success('Maintenance log added')
     }
     onOpenChange(false)
@@ -141,7 +158,14 @@ export function LogModal({ open, onOpenChange, editItem, prefillVehicleId, prefi
               {(['Vehicle', 'Trailer'] as UnitType[]).map(t => (
                 <button
                   key={t}
-                  onClick={() => setUnitType(t)}
+                  onClick={() => {
+                    setUnitType(t)
+                    if (t === 'Vehicle') setTrailerId('')
+                    if (t === 'Trailer') {
+                      setVehicleId('')
+                      setMileage('')
+                    }
+                  }}
                   className={`flex-1 h-9 text-sm rounded border transition-colors font-medium ${unitType === t ? 'border-primary-container bg-primary-container/10 text-primary-container' : 'border-border bg-transparent text-on-surface-variant hover:border-outline hover:text-on-surface'}`}
                 >
                   {t}
@@ -166,7 +190,7 @@ export function LogModal({ open, onOpenChange, editItem, prefillVehicleId, prefi
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label>Maintenance Type</Label>
-              <Select value={maintenanceTypeId} onValueChange={setMaintenanceTypeId} options={typeOptions} placeholder="Select type" />
+              <Select value={maintenanceTypeId} onValueChange={setMaintenanceTypeId} options={typeOptions} placeholder="Select type" error={errors.maintenanceTypeId} />
             </div>
             <div>
               <Label>Plan</Label>
@@ -195,7 +219,7 @@ export function LogModal({ open, onOpenChange, editItem, prefillVehicleId, prefi
           {unitType === 'Vehicle' && (
             <div>
               <Label>Mileage</Label>
-              <Input value={mileage} onChange={e => setMileage(e.target.value)} type="number" placeholder="e.g. 312000" />
+              <Input value={mileage} onChange={e => setMileage(e.target.value)} type="number" min={0} placeholder="e.g. 312000" error={errors.mileage} />
             </div>
           )}
 

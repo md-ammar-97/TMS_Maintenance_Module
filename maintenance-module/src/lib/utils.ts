@@ -47,6 +47,19 @@ export function generateId(): string {
   return crypto.randomUUID()
 }
 
+export function formatEmpty(value: unknown): string {
+  if (value === null || value === undefined || value === '') return '—'
+  return String(value)
+}
+
+export function formatMileage(value?: number): string {
+  return typeof value === 'number' ? `${value.toLocaleString()} mi` : '—'
+}
+
+export function getUnitOptionLabel(number: string, status?: string): string {
+  return status === 'Inactive' ? `${number} (Inactive)` : number
+}
+
 export function today(): string {
   return new Date().toISOString().split('T')[0]
 }

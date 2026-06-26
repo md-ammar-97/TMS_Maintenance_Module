@@ -1,5 +1,7 @@
 # Context — Maintenance Module Frontend Prototype
 
+> **Design:** visual language is **Uber Base**, light-first with dark parity, organized as a Figma token library — see `design.md`. Dense tables are made scannable by the Data Encoding System (color + icon per entity, category, and status), not left as monochrome grids.
+
 ---
 
 ## 1. WHAT WE ARE BUILDING
@@ -213,17 +215,19 @@ This is intentional for a prototype — no permanent state means no cleanup requ
 | Maintenance Logs (Trailer) | 3+ hardcoded rows |
 | Maintenance Bills (Vehicle) | 3+ hardcoded rows |
 | Maintenance Bills (Trailer) | 3+ hardcoded rows |
-| Due Maintenance Records | Enough to show green/yellow/red status mix |
-| Inspections (Vehicle) | 2 per unit |
-| Inspections (Trailer) | 2 per unit |
+| Due Maintenance Records | 8–10 (green/amber/red mix across vehicles + trailers) |
+| Inspections (Vehicle) | 4 total (≈2 across two seeded vehicle units) |
+| Inspections (Trailer) | 4 total (≈2 across two seeded trailer units) |
 
 ---
 
 ## 11. UI/UX PRINCIPLES
 
-- **Enterprise SaaS style** — clean, table-heavy, data-dense like a real TMS admin dashboard
-- **No decorative elements** — no hero images, illustrations, or marketing copy
-- **Primary buttons are always prominent** — blue, filled, top-right of page
+- **Uber Base, light-first** — clean, table-heavy, data-dense like a real TMS admin dashboard; dark mode is a parity toggle
+- **Color and icons carry meaning** — every entity type, maintenance category, and status has a fixed hue + icon so a 14-column row can be scanned, not decoded (see `design.md §9`)
+- **Color is never the only signal** — status = icon + label + color, for accessibility
+- **No decorative elements** — no hero images, illustrations, or marketing copy; color is semantic only
+- **One primary button per view** — filled blue, top-right of the page header
 - **Secondary buttons are lighter** — outlined or ghost style
 - **Row actions under three-dot menus** — never inline buttons that clutter the table
 - **Tabs for Vehicle/Trailer context** — the same page serves both with a tab toggle

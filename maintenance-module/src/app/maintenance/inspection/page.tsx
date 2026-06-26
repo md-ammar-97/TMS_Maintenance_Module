@@ -1,188 +1,220 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { motion } from 'framer-motion'
-import { useApp } from '@/context/AppContext'
-import { cn, formatDate } from '@/lib/utils'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useApp } from '@/context/AppContext'
+import { cn, formatDate, formatMileage } from '@/lib/utils'
+import type { Inspection, UnitType } from '@/types'
 
-function InspStatusBadge({ status }: { status: string }) {
-  if (status === 'Passed')
-    return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-success/10 text-success border border-success/20">Passed</span>
-  if (status === 'Failed')
-    return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-error/10 text-error border border-error/20">Failed</span>
-  if (status?.includes('Minor'))
-    return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-warning/10 text-warning border border-warning/20">{status}</span>
-  return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface-container-highest text-on-surface-variant border border-outline-variant">{status}</span>
+function InspectionStatusBadge({ inspection }: { inspection: Inspection }) {
+  const defects = inspection.items.filter(item => item.result === 'Def').length
+  const passed = defects === 0
+  return (
+    <span className={cn(
+      'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold',
+      passed ? 'border-success/20 bg-success/10 text-success' : 'border-warning/20 bg-warning/10 text-warning'
+    )}>
+      <span className="material-symbols-outlined text-[13px]">{passed ? 'check_circle' : 'warning'}</span>
+      {passed ? 'Passed' : 'Needs Minor Repair'}
+    </span>
+  )
+}
+
+function DefectsChip({ count }: { count: number }) {
+  if (count === 0) return <span className="text-on-surface-variant">—</span>
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full border border-error/20 bg-error/10 px-2 py-0.5 text-xs font-semibold text-error">
+      <span className="material-symbols-outlined text-[13px]">report</span>
+      {count}
+    </span>
+  )
 }
 
 export default function InspectionPage() {
-  const { vehicles, trailers, inspections } = useApp()
+  const { vehicles, trailers, carriers, inspections } = useApp()
+  const [tab, setTab] = useState<'vehicle' | 'trailer'>('vehicle')
   const [unitSearch, setUnitSearch] = useState('')
-  const [selectedUnit, setSelectedUnit] = useState<{ type: 'vehicle' | 'trailer'; id: string } | null>(null)
+  const [carrierFilter, setCarrierFilter] = useState('all')
+  const [selectedUnitId, setSelectedUnitId] = useState('')
+  const [reportYear, setReportYear] = useState('2026')
 
-  const allUnits = useMemo(() => [
-    ...vehicles.map(v => ({ type: 'vehicle' as const, id: v.id, number: v.vehicleNumber, carrierId: v.carrierId })),
-    ...trailers.map(t => ({ type: 'trailer' as const, id: t.id, number: t.trailerNumber, carrierId: t.carrierId })),
-  ].filter(u => !unitSearch || u.number.toLowerCase().includes(unitSearch.toLowerCase())), [vehicles, trailers, unitSearch])
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const type = params.get('type')
+    const unit = params.get('unit')
+    if (type === 'trailer' || type === 'vehicle') setTab(type)
+    if (unit) setSelectedUnitId(unit)
+  }, [])
+
+  const units = useMemo(() => {
+    const source = tab === 'vehicle'
+      ? vehicles.map(v => ({ id: v.id, number: v.vehicleNumber, carrierId: v.carrierId, status: v.status }))
+      : trailers.map(t => ({ id: t.id, number: t.trailerNumber, carrierId: t.carrierId, status: t.status }))
+    return source
+      .filter(unit => carrierFilter === 'all' || unit.carrierId === carrierFilter)
+      .filter(unit => !unitSearch || unit.number.toLowerCase().includes(unitSearch.toLowerCase()))
+  }, [tab, vehicles, trailers, carrierFilter, unitSearch])
+
+  useEffect(() => {
+    if (selectedUnitId && !units.some(unit => unit.id === selectedUnitId)) setSelectedUnitId('')
+  }, [selectedUnitId, units])
 
   const unitInspections = useMemo(() => {
-    if (!selectedUnit) return []
-    return inspections.filter(i =>
-      selectedUnit.type === 'vehicle' ? i.vehicleId === selectedUnit.id : i.trailerId === selectedUnit.id
-    )
-  }, [inspections, selectedUnit])
+    return inspections
+      .filter(inspection => tab === 'vehicle' ? inspection.vehicleId === selectedUnitId : inspection.trailerId === selectedUnitId)
+      .sort((a, b) => b.inspectionDate.localeCompare(a.inspectionDate))
+  }, [inspections, selectedUnitId, tab])
 
-  const lastInspection = unitInspections[0] ?? null
-  const defCount = lastInspection ? lastInspection.items.filter(i => i.result === 'Def').length : 0
-  const isCompliant = lastInspection ? defCount === 0 : false
+  const selectedUnit = units.find(unit => unit.id === selectedUnitId)
+  const lastInspection = unitInspections[0]
+  const lastDefects = lastInspection?.items.filter(item => item.result === 'Def').length ?? 0
 
-  const selectedUnitData = selectedUnit
-    ? (selectedUnit.type === 'vehicle'
-        ? vehicles.find(v => v.id === selectedUnit.id)
-        : trailers.find(t => t.id === selectedUnit.id))
-    : null
+  function selectedCarrierName(carrierId?: string) {
+    return carriers.find(carrier => carrier.id === carrierId)?.name ?? 'Unknown Carrier'
+  }
 
-  const unitNum = selectedUnit?.type === 'vehicle'
-    ? (selectedUnitData as typeof vehicles[0])?.vehicleNumber ?? ''
-    : (selectedUnitData as typeof trailers[0])?.trailerNumber ?? ''
+  function handleTabChange(next: 'vehicle' | 'trailer') {
+    setTab(next)
+    setSelectedUnitId('')
+    setUnitSearch('')
+    setCarrierFilter('all')
+  }
 
   return (
     <div className="flex h-full overflow-hidden">
-      {/* Left panel — Unit selection */}
-      <div className="w-80 border-r border-border flex flex-col bg-surface-container-lowest shrink-0">
-        <div className="p-4 border-b border-border">
-          <h3 className="text-sm font-semibold text-on-surface mb-3">Unit Selection</h3>
-          <div className="relative">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[16px]">search</span>
+      <div className="flex w-80 shrink-0 flex-col border-r border-border bg-surface-container-lowest">
+        <div className="border-b border-border p-4">
+          <h2 className="mb-3 text-sm font-semibold text-on-surface">Inspection Compliance</h2>
+          <div className="mb-3 flex rounded bg-surface-container-high p-1">
+            {(['vehicle', 'trailer'] as const).map(value => (
+              <button
+                key={value}
+                onClick={() => handleTabChange(value)}
+                className={cn(
+                  'flex-1 rounded px-3 py-1.5 text-sm font-medium capitalize',
+                  tab === value ? 'bg-surface text-on-surface shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
+                )}
+              >
+                {value}
+              </button>
+            ))}
+          </div>
+          <div className="relative mb-3">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[16px] text-on-surface-variant">search</span>
             <input
               value={unitSearch}
-              onChange={e => setUnitSearch(e.target.value)}
-              placeholder="Search units..."
-              className="h-9 w-full pl-9 pr-3 text-sm rounded border bg-surface-container-low border-border text-on-surface placeholder:text-outline outline-none focus:ring-1 focus:ring-primary transition-colors"
+              onChange={event => setUnitSearch(event.target.value)}
+              placeholder="Unit Number"
+              className="h-9 w-full rounded border border-border bg-surface-container-low pl-9 pr-3 text-sm text-on-surface outline-none focus:border-primary"
             />
           </div>
+          <select
+            value={carrierFilter}
+            onChange={event => setCarrierFilter(event.target.value)}
+            className="h-9 w-full rounded border border-border bg-surface-container-low px-3 text-sm text-on-surface"
+          >
+            <option value="all">All Carriers</option>
+            {carriers.map(carrier => <option key={carrier.id} value={carrier.id}>{carrier.name}</option>)}
+          </select>
         </div>
+
         <div className="flex-1 overflow-y-auto p-2">
-          {allUnits.length === 0 ? (
-            <p className="text-center text-sm text-outline p-4">No units found.</p>
-          ) : (
-            allUnits.map(unit => {
-              const isActive = selectedUnit?.id === unit.id
-              return (
-                <button
-                  key={unit.id}
-                  onClick={() => setSelectedUnit(unit)}
-                  className={cn(
-                    'w-full text-left px-3 py-3 rounded-lg mb-1 border transition-colors',
-                    isActive
-                      ? 'bg-surface-container border-border text-primary'
-                      : 'border-transparent hover:bg-surface-container-low hover:border-border text-on-surface'
-                  )}
-                >
-                  <div className={cn('text-sm font-medium', isActive ? 'font-bold' : '')}>{unit.number}</div>
-                  <div className="text-xs text-outline mt-0.5 capitalize">{unit.type}</div>
-                </button>
-              )
-            })
-          )}
+          {units.length === 0 ? (
+            <p className="p-6 text-center text-sm text-outline">No units found.</p>
+          ) : units.map(unit => (
+            <button
+              key={unit.id}
+              onClick={() => setSelectedUnitId(unit.id)}
+              className={cn(
+                'mb-1 w-full rounded border px-3 py-3 text-left transition-colors',
+                selectedUnitId === unit.id
+                  ? 'border-primary-container bg-primary-container/10 text-primary-container'
+                  : 'border-transparent text-on-surface hover:border-border hover:bg-surface-container-low'
+              )}
+            >
+              <div className="font-mono text-sm font-semibold">{unit.number}</div>
+              <div className="mt-0.5 truncate text-xs text-outline" title={selectedCarrierName(unit.carrierId)}>
+                {selectedCarrierName(unit.carrierId)}{unit.status === 'Inactive' ? ' · Inactive' : ''}
+              </div>
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Right panel */}
-      <div className="flex-1 flex flex-col overflow-hidden bg-background">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden bg-background">
         {!selectedUnit ? (
-          <div className="flex-1 flex items-center justify-center">
+          <div className="flex flex-1 items-center justify-center">
             <div className="text-center">
-              <span className="material-symbols-outlined text-[48px] text-outline mb-3 block">fact_check</span>
-              <p className="text-on-surface-variant text-sm">Select a unit to view inspection records.</p>
+              <span className="material-symbols-outlined mb-3 block text-[48px] text-outline">fact_check</span>
+              <p className="text-sm text-on-surface-variant">Select a unit from the list to view inspection records.</p>
             </div>
           </div>
         ) : (
           <div className="flex-1 overflow-y-auto p-6">
-            {/* Status cards */}
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              {/* Status card */}
-              <div className="col-span-2 bg-surface rounded-lg border border-border p-4">
-                <div className="text-xs text-on-surface-variant font-mono uppercase tracking-wider mb-3">Current Status: {unitNum}</div>
-                <div className="flex items-center gap-2 mb-3">
-                  <span className={cn('h-2.5 w-2.5 rounded-full', isCompliant ? 'bg-success' : 'bg-error')} />
-                  <span className={cn('text-base font-semibold', isCompliant ? 'text-success' : 'text-error')}>
-                    {isCompliant ? 'Compliant' : 'Non-Compliant'}
-                  </span>
+            <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-3">
+                  <div className={cn('flex h-10 min-w-10 items-center justify-center rounded px-2 font-mono text-sm font-bold', tab === 'vehicle' ? 'bg-primary-container/10 text-primary-container' : 'bg-success/10 text-success')}>
+                    {selectedUnit.number.slice(0, 3)}
+                  </div>
+                  <div>
+                    <h1 className="text-2xl font-semibold text-on-surface">{selectedUnit.number}</h1>
+                    <p className="text-sm text-on-surface-variant">{selectedCarrierName(selectedUnit.carrierId)}</p>
+                  </div>
                 </div>
-                <div className="text-xs text-on-surface-variant">
-                  Last Inspection: <span className="text-on-surface">{lastInspection ? formatDate(lastInspection.inspectionDate) : 'No record'}</span>
+                <div className="mt-4 flex items-center gap-3">
+                  {lastInspection ? <InspectionStatusBadge inspection={lastInspection} /> : <span className="text-sm text-on-surface-variant">No inspection record</span>}
+                  <span className="text-sm text-on-surface-variant">Last inspection: {lastInspection ? formatDate(lastInspection.inspectionDate) : '—'}</span>
+                  {lastDefects > 0 && <DefectsChip count={lastDefects} />}
                 </div>
-                {defCount > 0 && (
-                  <div className="text-xs text-error mt-1">{defCount} defect{defCount > 1 ? 's' : ''} found</div>
-                )}
               </div>
 
-              {/* Annual report card */}
-              <div className="bg-surface rounded-lg border border-border p-4 flex flex-col justify-between">
-                <div className="text-xs text-on-surface-variant font-mono uppercase tracking-wider mb-2">Annual Report</div>
-                <div className="text-2xl font-bold text-on-surface font-mono">{unitInspections.length}</div>
-                <div className="text-xs text-on-surface-variant">Total Inspections</div>
+              <div className="flex flex-wrap items-center gap-2">
+                <select value={reportYear} onChange={event => setReportYear(event.target.value)} className="h-9 rounded border border-border bg-surface-container-low px-3 text-sm text-on-surface">
+                  {['2026', '2025', '2024', '2023', '2022', '2021'].map(year => <option key={year}>{year}</option>)}
+                </select>
+                <button onClick={() => window.print()} className="h-9 rounded border border-border px-3 text-sm text-on-surface-variant hover:bg-surface-container-high">
+                  Download
+                </button>
+                <Link
+                  href={`/maintenance/inspection/new?type=${tab}&unit=${selectedUnit.id}`}
+                  className="inline-flex h-9 items-center gap-2 rounded bg-primary-container px-4 text-sm font-medium text-on-primary-container hover:bg-inverse-primary"
+                >
+                  <span className="material-symbols-outlined text-[18px]">add_task</span>
+                  {tab === 'vehicle' ? 'Create new truck inspection' : 'Create new trailer inspection'}
+                </Link>
               </div>
             </div>
 
-            {/* Action button */}
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-semibold text-on-surface">Inspection Records</h3>
-              <Link
-                href={`/maintenance/inspection/new?unit=${selectedUnit.id}&type=${selectedUnit.type}`}
-                className="flex items-center gap-2 bg-primary-container text-on-primary-container hover:bg-inverse-primary transition-colors py-2 px-4 rounded font-medium text-sm shadow-[0_0_10px_rgba(0,112,243,0.3)]"
-              >
-                <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>add_task</span>
-                New Inspection
-              </Link>
-            </div>
-
-            {/* Inspections table */}
-            <div className="bg-surface rounded-lg border border-border overflow-hidden">
-              <table className="w-full text-left border-collapse">
+            <div className="overflow-hidden rounded-lg border border-border bg-surface">
+              <table className="w-full min-w-[760px] border-collapse text-left text-sm">
                 <thead>
-                  <tr className="bg-surface-container-low border-b border-border">
-                    {['Date', 'Type', 'Inspector', 'Status', 'Actions'].map(h => (
-                      <th key={h} className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-on-surface-variant font-mono">{h}</th>
+                  <tr className="border-b border-border bg-surface-container-low">
+                    {['Actions', 'Inspection Date', 'Inspection By', 'Status', 'Defects', 'Mileage'].map(header => (
+                      <th key={header} className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-on-surface-variant">{header}</th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border text-sm">
+                <tbody className="divide-y divide-border">
                   {unitInspections.length === 0 ? (
-                    <tr><td colSpan={5} className="px-4 py-12 text-center text-sm text-outline">No inspection records found.</td></tr>
-                  ) : (
-                    unitInspections.map((insp, i) => (
-                      <motion.tr
-                        key={insp.id}
-                        initial={{ opacity: 0, y: 4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.15, delay: i * 0.03 }}
-                        className="hover:bg-surface-container-lowest/50 transition-colors"
-                      >
-                        <td className="px-4 py-3 text-on-surface-variant">{formatDate(insp.inspectionDate)}</td>
-                        <td className="px-4 py-3 text-on-surface">{insp.unitType}</td>
-                        <td className="px-4 py-3 text-on-surface-variant">{insp.inspectionBy ?? '—'}</td>
+                    <tr><td colSpan={6} className="px-4 py-16 text-center text-sm text-outline">No inspection records found.</td></tr>
+                  ) : unitInspections.map(inspection => {
+                    const defects = inspection.items.filter(item => item.result === 'Def').length
+                    return (
+                      <tr key={inspection.id} className="hover:bg-surface-container-low">
                         <td className="px-4 py-3">
-                          <InspStatusBadge status={insp.items.some(it => it.result === 'Def') ? 'Failed' : 'Passed'} />
+                          <button onClick={() => window.print()} className="rounded p-1 text-on-surface-variant hover:bg-surface-container-high hover:text-primary">
+                            <span className="material-symbols-outlined text-[16px]">download</span>
+                          </button>
                         </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            <Link
-                              href={`/maintenance/inspection/${insp.id}`}
-                              className="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors"
-                            >
-                              <span className="material-symbols-outlined text-[16px]">visibility</span>
-                            </Link>
-                            <button className="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors">
-                              <span className="material-symbols-outlined text-[16px]">download</span>
-                            </button>
-                          </div>
-                        </td>
-                      </motion.tr>
-                    ))
-                  )}
+                        <td className="px-4 py-3 text-on-surface-variant">{formatDate(inspection.inspectionDate)}</td>
+                        <td className="px-4 py-3 text-on-surface">{inspection.inspectionBy}</td>
+                        <td className="px-4 py-3"><InspectionStatusBadge inspection={inspection} /></td>
+                        <td className="px-4 py-3"><DefectsChip count={defects} /></td>
+                        <td className="px-4 py-3 text-right font-mono text-xs text-on-surface-variant">{formatMileage(inspection.mileage)}</td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
