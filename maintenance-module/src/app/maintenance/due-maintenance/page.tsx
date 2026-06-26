@@ -11,6 +11,7 @@ import type { DueMaintenanceRecord, DueStatus, MaintenanceLog } from '@/types'
 
 const ROWS_PER_PAGE = 10
 const MS_PER_DAY = 24 * 60 * 60 * 1000
+const TABLE_HEADERS = ['Actions', 'Plan Name', 'Vehicle Type', 'Number', 'Last Service Date', 'Last Service Mileage', 'Current Mileage', 'Due In']
 
 function DueInChip({ status, dueIn }: { status: DueStatus; dueIn: string }) {
   const classes: Record<DueStatus, string> = {
@@ -72,10 +73,6 @@ export default function DueMaintenancePage() {
   function getPlan(record: DueMaintenanceRecord) {
     return maintenancePlans.find(p => p.id === record.maintenancePlanId)
   }
-  function getType(record: DueMaintenanceRecord) {
-    const plan = getPlan(record)
-    return plan ? maintenanceTypes.find(t => t.id === plan.maintenanceTypeId) : undefined
-  }
   function getVehicle(record: DueMaintenanceRecord) {
     return record.vehicleId ? vehicles.find(v => v.id === record.vehicleId) : undefined
   }
@@ -106,17 +103,15 @@ export default function DueMaintenancePage() {
 
   const exportRows = filtered.map(record => {
     const plan = getPlan(record)
-    const type = getType(record)
     return {
-      Plan: plan?.name ?? 'Unknown Plan',
-      Type: record.unitType,
+      Actions: '',
+      'Plan Name': plan?.name ?? 'Unknown Plan',
+      'Vehicle Type': record.unitType,
       Number: getUnitNumber(record),
-      MaintenanceType: type?.name ?? 'Unknown Type',
-      LastServiceDate: record.lastServiceDate ?? '',
-      LastServiceMileage: record.lastServiceMileage ?? '',
-      CurrentMileage: record.currentMileage ?? '',
-      DueIn: record.dueIn,
-      DueStatus: record.dueStatus,
+      'Last Service Date': record.lastServiceDate ?? '',
+      'Last Service Mileage': record.lastServiceMileage ?? '',
+      'Current Mileage': record.currentMileage ?? '',
+      'Due In': record.dueIn,
     }
   })
 
@@ -171,7 +166,7 @@ export default function DueMaintenancePage() {
           </div>
           <ExportButton
             filename="due-maintenance"
-            columns={['Plan', 'Type', 'Number', 'MaintenanceType', 'LastServiceDate', 'LastServiceMileage', 'CurrentMileage', 'DueIn', 'DueStatus']}
+            columns={TABLE_HEADERS}
             rows={exportRows}
           />
         </div>
@@ -223,7 +218,7 @@ export default function DueMaintenancePage() {
           <table className="w-full min-w-[980px] border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-border bg-surface-container-low">
-                {['Actions', 'Plan Name', 'Vehicle Type', 'Number', 'Last Service Date', 'Last Service Mileage', 'Current Mileage', 'Due In'].map(header => (
+                {TABLE_HEADERS.map(header => (
                   <th key={header} className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-on-surface-variant">{header}</th>
                 ))}
               </tr>

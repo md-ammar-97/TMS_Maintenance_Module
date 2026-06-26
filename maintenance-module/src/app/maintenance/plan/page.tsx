@@ -86,13 +86,14 @@ export default function PlanPage() {
   ]
 
   const exportRows = filtered.map(plan => ({
+    Actions: '',
     Name: plan.name,
-    MaintenanceType: maintenanceTypes.find(t => t.id === plan.maintenanceTypeId)?.name ?? 'Unknown Type',
-    IntervalType: plan.intervalType,
+    'Maintenance Type': maintenanceTypes.find(t => t.id === plan.maintenanceTypeId)?.name ?? 'Unknown Type',
+    'Interval Type': plan.intervalType,
     Interval: plan.interval,
     Status: plan.status ? 'Active' : 'Inactive',
     Description: plan.description,
-    TotalOverdue: dueMaintenance.filter(d => d.maintenancePlanId === plan.id && d.dueStatus === 'Overdue').length,
+    'Total Overdue': dueMaintenance.filter(d => d.maintenancePlanId === plan.id && d.dueStatus === 'Overdue').length,
   }))
 
   return (
@@ -151,7 +152,7 @@ export default function PlanPage() {
           <div className="ml-auto">
             <ExportButton
               filename="maintenance-plans"
-              columns={['Name', 'MaintenanceType', 'IntervalType', 'Interval', 'Status', 'Description', 'TotalOverdue']}
+              columns={columns.map(column => column.header)}
               rows={exportRows}
             />
           </div>

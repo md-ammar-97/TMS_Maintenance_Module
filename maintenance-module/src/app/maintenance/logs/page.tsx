@@ -11,6 +11,7 @@ import { LogModal } from './LogModal'
 import type { MaintenanceLog } from '@/types'
 
 const ROWS_PER_PAGE = 10
+const TABLE_HEADERS = ['Actions', 'Unit #', 'Carrier', 'Vendor', 'Maintenance Type', 'External Type', 'Plan Name', 'Tire Position', 'Service Date', 'Mileage', 'Amount', 'Description', 'Created By', 'Bill Ref Number', 'Log Status', 'Currency', 'GST', 'HST', 'QST']
 
 function StatusPill({ mapped }: { mapped: boolean }) {
   return (
@@ -107,20 +108,21 @@ export default function LogsPage() {
   const paged = filtered.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE)
 
   const exportRows = filtered.map(log => ({
-    MaintenanceType: getTypeName(log),
-    ExternalMaintenanceType: log.externalMaintenanceType ?? '',
-    PlanName: getPlanName(log),
-    TirePosition: log.tirePosition ?? '',
-    UnitNumber: getUnitNumber(log),
+    Actions: '',
+    'Unit #': getUnitNumber(log),
     Carrier: getCarrierName(log),
     Vendor: getVendorName(log),
-    ServiceDate: log.serviceDate,
+    'Maintenance Type': getTypeName(log),
+    'External Type': log.externalMaintenanceType ?? '',
+    'Plan Name': getPlanName(log),
+    'Tire Position': log.tirePosition ?? '',
+    'Service Date': log.serviceDate,
     Mileage: log.mileage ?? '',
     Amount: log.amount,
     Description: log.description ?? '',
-    CreatedBy: log.createdBy,
-    BillRefNumber: log.billRefNumber ?? '',
-    LogStatus: log.billId ? 'Mapped' : 'UnMapped',
+    'Created By': log.createdBy,
+    'Bill Ref Number': log.billRefNumber ?? '',
+    'Log Status': log.billId ? 'Mapped' : 'UnMapped',
     Currency: log.currency,
     GST: log.gst ?? '',
     HST: log.hst ?? '',
@@ -150,9 +152,6 @@ export default function LogsPage() {
               <div className="font-mono text-xs text-on-surface-variant">Total Amount</div>
               <div className="font-mono text-sm font-semibold text-on-surface">{formatCurrency(totalAmount)}</div>
             </div>
-            <button onClick={() => toast.info('PullRay Integration Logs are not available in this prototype.')} className="rounded border border-border px-4 py-2 text-sm text-on-surface-variant hover:bg-surface-container-low">
-              PullRay Integration Logs
-            </button>
             <button onClick={() => { setEditLog(null); setModalOpen(true) }} className="inline-flex items-center gap-2 rounded bg-primary-container px-4 py-2 text-sm font-medium text-on-primary-container hover:bg-inverse-primary">
               <span className="material-symbols-outlined text-[18px]">add</span>
               Create new maintenance log
@@ -201,7 +200,7 @@ export default function LogsPage() {
           <div className="ml-auto">
             <ExportButton
               filename="maintenance-logs"
-              columns={['MaintenanceType', 'ExternalMaintenanceType', 'PlanName', 'TirePosition', 'UnitNumber', 'Carrier', 'Vendor', 'ServiceDate', 'Mileage', 'Amount', 'Description', 'CreatedBy', 'BillRefNumber', 'LogStatus', 'Currency', 'GST', 'HST', 'QST']}
+              columns={TABLE_HEADERS}
               rows={exportRows}
             />
           </div>
@@ -213,7 +212,7 @@ export default function LogsPage() {
           <table className="w-full min-w-[1500px] border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-border bg-surface-container-low">
-                {['Actions', 'Unit #', 'Carrier', 'Vendor', 'Maintenance Type', 'External Type', 'Plan Name', 'Tire Position', 'Service Date', 'Mileage', 'Amount', 'Description', 'Created By', 'Bill Ref Number', 'Log Status', 'Currency', 'GST', 'HST', 'QST'].map(header => (
+                {TABLE_HEADERS.map(header => (
                   <th key={header} className={cn('px-4 py-3 text-xs font-medium uppercase tracking-wider text-on-surface-variant', ['Mileage', 'Amount', 'GST', 'HST', 'QST'].includes(header) && 'text-right')}>{header}</th>
                 ))}
               </tr>

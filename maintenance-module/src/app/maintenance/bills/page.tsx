@@ -11,6 +11,7 @@ import { BillModal } from './BillModal'
 import type { MaintenanceBill } from '@/types'
 
 const ROWS_PER_PAGE = 10
+const TABLE_HEADERS = ['Actions', 'Bill Ref Number', 'Payment Status', 'Vendor Name', 'Carrier', 'Vehicle/Trailer Number', 'Bill Date', 'Total Amount', 'Work Completed Date', 'Mileage', 'Location']
 
 function BillStatusBadge({ status }: { status: string }) {
   if (status === 'Paid') return <span className="inline-flex rounded-full border border-success/20 bg-success/10 px-2 py-0.5 text-xs font-semibold text-success">Paid</span>
@@ -65,14 +66,15 @@ export default function BillsPage() {
   const totalPages = Math.max(1, Math.ceil(filtered.length / ROWS_PER_PAGE))
   const paged = filtered.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE)
   const exportRows = filtered.map(bill => ({
-    BillRefNumber: bill.billRefNumber,
-    PaymentStatus: bill.paymentStatus,
-    VendorName: getVendorName(bill),
+    Actions: '',
+    'Bill Ref Number': bill.billRefNumber,
+    'Payment Status': bill.paymentStatus,
+    'Vendor Name': getVendorName(bill),
     Carrier: getCarrierName(bill),
-    UnitNumber: getUnitNumber(bill),
-    BillDate: bill.billDate,
-    TotalAmount: bill.totalAmount,
-    WorkCompletedDate: bill.workCompletedDate ?? '',
+    'Vehicle/Trailer Number': getUnitNumber(bill),
+    'Bill Date': bill.billDate,
+    'Total Amount': bill.totalAmount,
+    'Work Completed Date': bill.workCompletedDate ?? '',
     Mileage: bill.mileage ?? '',
     Location: bill.location ?? '',
   }))
@@ -95,9 +97,6 @@ export default function BillsPage() {
             <p className="mt-0.5 text-sm text-on-surface-variant">Track vendor invoices and linked maintenance log items.</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <button onClick={() => toast.info('PullRay Integration Logs are not available in this prototype.')} className="rounded border border-border px-4 py-2 text-sm text-on-surface-variant hover:bg-surface-container-low">
-              PullRay Integration Logs
-            </button>
             <button onClick={() => { setEditBill(null); setModalOpen(true) }} className="inline-flex items-center gap-2 rounded bg-primary-container px-4 py-2 text-sm font-medium text-on-primary-container hover:bg-inverse-primary">
               <span className="material-symbols-outlined text-[18px]">add</span>
               Create new maintenance bill
@@ -142,7 +141,7 @@ export default function BillsPage() {
           <div className="ml-auto">
             <ExportButton
               filename="maintenance-bills"
-              columns={['BillRefNumber', 'PaymentStatus', 'VendorName', 'Carrier', 'UnitNumber', 'BillDate', 'TotalAmount', 'WorkCompletedDate', 'Mileage', 'Location']}
+              columns={TABLE_HEADERS}
               rows={exportRows}
             />
           </div>
@@ -154,7 +153,7 @@ export default function BillsPage() {
           <table className="w-full min-w-[1120px] border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-border bg-surface-container-low">
-                {['Actions', 'Bill Ref Number', 'Payment Status', 'Vendor Name', 'Carrier', 'Vehicle/Trailer Number', 'Bill Date', 'Total Amount', 'Work Completed Date', 'Mileage', 'Location'].map(header => (
+                {TABLE_HEADERS.map(header => (
                   <th key={header} className={cn('px-4 py-3 text-xs font-medium uppercase tracking-wider text-on-surface-variant', ['Total Amount', 'Mileage'].includes(header) && 'text-right')}>{header}</th>
                 ))}
               </tr>

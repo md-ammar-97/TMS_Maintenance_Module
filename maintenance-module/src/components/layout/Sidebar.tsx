@@ -21,7 +21,7 @@ export function Sidebar() {
   return (
     <nav className="hidden md:flex flex-col h-screen overflow-y-auto py-4 bg-surface-container-lowest border-r border-border fixed left-0 top-0 w-60 z-40">
       {/* Logo */}
-      <div className="px-6 mb-8">
+      <div className="px-6 mb-4">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded bg-primary-container flex items-center justify-center text-on-primary-container text-xs font-bold flex-shrink-0">
             FX
@@ -31,14 +31,6 @@ export function Sidebar() {
             <p className="text-xs text-on-surface-variant">(by Axestrack)</p>
           </div>
         </div>
-      </div>
-
-      {/* Create Work Order */}
-      <div className="px-4 mb-6">
-        <button className="w-full bg-primary-container text-on-primary-container hover:bg-inverse-primary transition-all text-sm font-medium py-2 rounded-lg flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(0,112,243,0.3)]">
-          <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>add</span>
-          Create Work Order
-        </button>
       </div>
 
       {/* Nav items */}

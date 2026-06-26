@@ -10,6 +10,8 @@ import { ExportButton } from '@/components/shared/ExportButton'
 import { PartModal } from './PartModal'
 import type { Part } from '@/types'
 
+const TABLE_HEADERS = ['Part Name', 'SKU / ID', 'Description', 'Actions']
+
 export default function PartsPage() {
   const { parts, deletePart } = useApp()
   const [search, setSearch] = useState('')
@@ -22,7 +24,12 @@ export default function PartsPage() {
     search ? parts.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.description.toLowerCase().includes(search.toLowerCase())) : parts,
     [parts, search]
   )
-  const exportRows = filtered.map(part => ({ Name: part.name, Description: part.description }))
+  const exportRows = filtered.map(part => ({
+    'Part Name': part.name,
+    'SKU / ID': part.id.toUpperCase().replace('PART-', 'SKU-'),
+    Description: part.description,
+    Actions: '',
+  }))
 
   function toggleSelect(id: string) {
     setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
@@ -63,7 +70,7 @@ export default function PartsPage() {
             />
           </div>
           <span className="text-xs text-on-surface-variant font-mono ml-auto">{filtered.length} items found</span>
-          <ExportButton filename="parts" columns={['Name', 'Description']} rows={exportRows} />
+          <ExportButton filename="parts" columns={TABLE_HEADERS} rows={exportRows} />
         </div>
 
         <table className="w-full text-left border-collapse">
