@@ -15,8 +15,8 @@ export function TopBar() {
         <span className="text-2xl font-bold text-primary hidden md:block tracking-widest">AXESTRACK</span>
       </div>
 
-      {/* Center: search */}
-      <div className="relative hidden sm:block flex-1 max-w-xs mx-6">
+      {/* Right: search */}
+      <div className="relative hidden sm:block w-72 ml-auto mr-3">
         <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
         <input
           className="bg-surface-container-low border border-border rounded-full py-1.5 pl-10 pr-4 text-sm text-on-surface placeholder:text-on-surface-variant w-full outline-none focus:border-primary transition-colors"
