@@ -2,13 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 import { useApp } from '@/context/AppContext'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { VEHICLE_INSPECTION_ITEMS, TRAILER_INSPECTION_ITEMS } from '@/types'
 import type { UnitType, InspectionItemResult } from '@/types'
@@ -81,27 +79,27 @@ export default function NewInspectionPage() {
   const defCount = items.filter(i => i.result === 'Def').length
 
   return (
-    <div className="flex flex-col h-full bg-gray-50">
+    <div className="flex flex-col h-full bg-background">
       {/* Top bar */}
-      <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center gap-3">
-        <button onClick={() => router.back()} className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 text-gray-500">
-          <ArrowLeft size={16} />
+      <div className="bg-surface border-b border-border px-6 py-3 flex items-center gap-3">
+        <button onClick={() => router.back()} className="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container-high text-on-surface-variant transition-colors">
+          <span className="material-symbols-outlined text-[18px]">arrow_back</span>
         </button>
         <div>
-          <h1 className="text-[15px] font-semibold text-gray-900">New Inspection</h1>
-          <p className="text-[11px] text-gray-400">{unitType} inspection</p>
+          <h1 className="text-sm font-semibold text-on-surface">New Inspection</h1>
+          <p className="text-xs text-on-surface-variant">{unitType} inspection</p>
         </div>
         <div className="ml-auto flex gap-2">
-          <Button variant="secondary" onClick={() => router.back()}>Cancel</Button>
-          <Button onClick={handleSubmit}>Save Inspection</Button>
+          <button onClick={() => router.back()} className="px-4 py-2 border border-border rounded text-sm text-on-surface-variant hover:bg-surface-container-low transition-colors">Cancel</button>
+          <button onClick={handleSubmit} className="px-4 py-2 bg-primary-container text-on-primary-container rounded text-sm font-medium hover:bg-inverse-primary transition-colors">Save Inspection</button>
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-3xl mx-auto px-6 py-6 flex flex-col gap-5">
           {/* Meta card */}
-          <div className="bg-white rounded-lg border border-gray-200 p-5">
-            <h2 className="text-[13px] font-semibold text-gray-700 mb-4">Inspection Details</h2>
+          <div className="bg-surface rounded-lg border border-border p-5">
+            <h2 className="text-sm font-semibold text-on-surface mb-4">Inspection Details</h2>
             <div className="grid grid-cols-2 gap-4">
               {/* Unit type toggle */}
               <div className="col-span-2">
@@ -111,7 +109,12 @@ export default function NewInspectionPage() {
                     <button
                       key={t}
                       onClick={() => { setUnitType(t); setVehicleId(''); setTrailerId('') }}
-                      className={`flex-1 h-9 text-[13px] rounded-md border transition-colors ${unitType === t ? 'border-blue-600 bg-blue-50 text-blue-700 font-medium' : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'}`}
+                      className={cn(
+                        'flex-1 h-9 text-sm rounded border transition-colors font-medium',
+                        unitType === t
+                          ? 'border-primary-container bg-primary-container/10 text-primary-container'
+                          : 'border-border bg-transparent text-on-surface-variant hover:border-outline hover:text-on-surface'
+                      )}
                     >
                       {t}
                     </button>
@@ -148,24 +151,24 @@ export default function NewInspectionPage() {
           </div>
 
           {/* Inspection items */}
-          <div className="bg-white rounded-lg border border-gray-200 p-5">
+          <div className="bg-surface rounded-lg border border-border p-5">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-[13px] font-semibold text-gray-700">Inspection Items</h2>
-                <p className="text-[11px] text-gray-400 mt-0.5">{items.length} items · {defCount > 0 ? `${defCount} defects` : 'No defects'}</p>
+                <h2 className="text-sm font-semibold text-on-surface">Inspection Items</h2>
+                <p className="text-xs text-on-surface-variant mt-0.5">{items.length} items · {defCount > 0 ? `${defCount} defects` : 'No defects'}</p>
               </div>
               <div className="flex gap-2">
-                <button onClick={() => setAllResult('OK')} className="text-[12px] text-green-700 bg-green-50 px-3 py-1.5 rounded-md hover:bg-green-100">All OK</button>
-                <button onClick={() => setAllResult('NA')} className="text-[12px] text-gray-600 bg-gray-50 px-3 py-1.5 rounded-md hover:bg-gray-100">All N/A</button>
+                <button onClick={() => setAllResult('OK')} className="text-xs text-success bg-success/10 px-3 py-1.5 rounded hover:bg-success/20 transition-colors">All OK</button>
+                <button onClick={() => setAllResult('NA')} className="text-xs text-on-surface-variant bg-surface-container-high px-3 py-1.5 rounded hover:bg-surface-container-highest transition-colors">All N/A</button>
               </div>
             </div>
 
             <div className="space-y-0">
-              <div className="grid grid-cols-[1fr_auto] gap-2 pb-2 border-b border-gray-100">
-                <span className="text-[11px] font-semibold text-gray-400 uppercase">Item</span>
+              <div className="grid grid-cols-[1fr_auto] gap-2 pb-2 border-b border-border">
+                <span className="text-[11px] font-semibold text-on-surface-variant uppercase font-mono">Item</span>
                 <div className="flex gap-2">
                   {(['OK', 'NA', 'Def'] as InspectionItemResult[]).map(r => (
-                    <span key={r} className="w-12 text-center text-[10px] font-semibold text-gray-400 uppercase">{r}</span>
+                    <span key={r} className="w-12 text-center text-[10px] font-semibold text-on-surface-variant uppercase font-mono">{r}</span>
                   ))}
                 </div>
               </div>
@@ -174,13 +177,13 @@ export default function NewInspectionPage() {
                 <div
                   key={item.itemNumber}
                   className={cn(
-                    'grid grid-cols-[1fr_auto] gap-2 py-2.5 border-b border-gray-50 items-center',
-                    item.result === 'Def' && 'bg-red-50 -mx-5 px-5'
+                    'grid grid-cols-[1fr_auto] gap-2 py-2.5 border-b border-border items-center',
+                    item.result === 'Def' && 'bg-error/5 -mx-5 px-5'
                   )}
                 >
                   <div className="flex items-start gap-2">
-                    <span className="text-[11px] text-gray-400 w-5 flex-shrink-0 mt-0.5">{item.itemNumber}.</span>
-                    <span className="text-[13px] text-gray-700">{item.description}</span>
+                    <span className="text-[11px] text-outline w-5 flex-shrink-0 mt-0.5">{item.itemNumber}.</span>
+                    <span className="text-sm text-on-surface-variant">{item.description}</span>
                   </div>
                   <div className="flex gap-2">
                     {(['OK', 'NA', 'Def'] as InspectionItemResult[]).map(r => (
@@ -190,10 +193,10 @@ export default function NewInspectionPage() {
                         className={cn(
                           'w-12 h-8 rounded text-[11px] font-semibold border transition-colors',
                           item.result === r
-                            ? r === 'OK' ? 'bg-green-600 border-green-600 text-white'
-                              : r === 'NA' ? 'bg-gray-500 border-gray-500 text-white'
-                              : 'bg-red-600 border-red-600 text-white'
-                            : 'bg-white border-gray-200 text-gray-400 hover:border-gray-300'
+                            ? r === 'OK' ? 'bg-success border-success text-white'
+                              : r === 'NA' ? 'bg-surface-container-highest border-outline-variant text-on-surface'
+                              : 'bg-error border-error text-white'
+                            : 'bg-transparent border-border text-on-surface-variant hover:border-outline hover:text-on-surface'
                         )}
                       >
                         {r}
@@ -206,8 +209,8 @@ export default function NewInspectionPage() {
           </div>
 
           <div className="flex justify-end gap-2">
-            <Button variant="secondary" onClick={() => router.back()}>Cancel</Button>
-            <Button onClick={handleSubmit}>Save Inspection</Button>
+            <button onClick={() => router.back()} className="px-4 py-2 border border-border rounded text-sm text-on-surface-variant hover:bg-surface-container-low transition-colors">Cancel</button>
+            <button onClick={handleSubmit} className="px-4 py-2 bg-primary-container text-on-primary-container rounded text-sm font-medium hover:bg-inverse-primary transition-colors">Save Inspection</button>
           </div>
         </div>
       </div>

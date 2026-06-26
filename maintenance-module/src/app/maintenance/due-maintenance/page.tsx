@@ -1,233 +1,167 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { motion } from 'framer-motion'
 import { useApp } from '@/context/AppContext'
-import { PageHeader } from '@/components/shared/PageHeader'
-import { DataTable, type Column } from '@/components/shared/DataTable'
-import { SearchInput } from '@/components/shared/SearchInput'
-import { ExportButton } from '@/components/shared/ExportButton'
-import { DueStatusBadge } from '@/components/shared/StatusBadge'
-import { Select } from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
-import { LogModal } from '../logs/LogModal'
+import { cn } from '@/lib/utils'
 import type { DueMaintenanceRecord } from '@/types'
-import { formatDate } from '@/lib/utils'
-import { Wrench } from 'lucide-react'
+
+const ROWS_PER_PAGE = 10
+
+function DueInChip({ dueIn }: { dueIn: string }) {
+  const negative = dueIn.startsWith('-')
+  const num = parseInt(dueIn.replace(/[^\d-]/g, ''))
+  const isWarning = !negative && num <= 500
+
+  if (negative) {
+    return <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium font-mono bg-error-container text-on-error-container">{dueIn}</span>
+  }
+  if (isWarning) {
+    return <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium font-mono bg-warning text-[#362400]">{dueIn}</span>
+  }
+  return <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium font-mono bg-surface-bright text-on-surface-variant border border-border">{dueIn}</span>
+}
 
 export default function DueMaintenancePage() {
-  const { dueMaintenance, maintenancePlans, maintenanceTypes, vehicles, trailers, carriers } = useApp()
-  const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
+  const { dueMaintenance: dueMaintenanceRecords, maintenancePlans, maintenanceTypes, vehicles, trailers } = useApp()
+  const [tab, setTab] = useState<'mileage' | 'date'>('mileage')
   const [unitFilter, setUnitFilter] = useState('all')
-  const [logModalOpen, setLogModalOpen] = useState(false)
-  const [prefill, setPrefill] = useState<{ vehicleId?: string; trailerId?: string; planId?: string }>({})
+  const [page, setPage] = useState(1)
 
   const filtered = useMemo(() => {
-    return dueMaintenance.filter(rec => {
-      if (statusFilter !== 'all' && rec.dueStatus !== statusFilter) return false
-      if (unitFilter !== 'all' && rec.unitType !== unitFilter) return false
-      if (search) {
-        const vehicle = rec.vehicleId ? vehicles.find(v => v.id === rec.vehicleId) : null
-        const trailer = rec.trailerId ? trailers.find(t => t.id === rec.trailerId) : null
-        const plan = maintenancePlans.find(p => p.id === rec.maintenancePlanId)
-        const type = plan ? maintenanceTypes.find(t => t.id === plan.maintenanceTypeId) : null
-        const q = search.toLowerCase()
-        if (
-          !vehicle?.vehicleNumber.toLowerCase().includes(q) &&
-          !trailer?.trailerNumber.toLowerCase().includes(q) &&
-          !plan?.name.toLowerCase().includes(q) &&
-          !type?.name.toLowerCase().includes(q)
-        ) return false
-      }
-      return true
-    })
-  }, [dueMaintenance, statusFilter, unitFilter, search, vehicles, trailers, maintenancePlans, maintenanceTypes])
+    let rows = dueMaintenanceRecords
+    if (unitFilter === 'truck')   rows = rows.filter(r => r.unitType === 'Vehicle')
+    if (unitFilter === 'trailer') rows = rows.filter(r => r.unitType === 'Trailer')
+    if (tab === 'mileage') rows = rows.filter(r => r.unitType === 'Vehicle')
+    if (tab === 'date')    rows = rows.filter(r => r.unitType === 'Trailer')
+    return rows
+  }, [dueMaintenanceRecords, unitFilter, tab])
 
-  function handleLogMaintenance(rec: DueMaintenanceRecord) {
-    setPrefill({
-      vehicleId: rec.vehicleId,
-      trailerId: rec.trailerId,
-      planId: rec.maintenancePlanId,
-    })
-    setLogModalOpen(true)
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ROWS_PER_PAGE))
+  const paged = filtered.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE)
+
+  function getUnitNum(r: DueMaintenanceRecord) {
+    if (r.vehicleId) return vehicles.find(v => v.id === r.vehicleId)?.vehicleNumber ?? r.vehicleId
+    if (r.trailerId) return trailers.find(t => t.id === r.trailerId)?.trailerNumber ?? r.trailerId
+    return '—'
+  }
+  function getPlanName(r: DueMaintenanceRecord) {
+    return maintenancePlans.find(p => p.id === r.maintenancePlanId)?.name ?? '—'
+  }
+  function getTypeName(r: DueMaintenanceRecord) {
+    const plan = maintenancePlans.find(p => p.id === r.maintenancePlanId)
+    return plan ? (maintenanceTypes.find(t => t.id === plan.maintenanceTypeId)?.name ?? '—') : '—'
   }
 
-  const columns: Column<DueMaintenanceRecord>[] = [
-    {
-      key: 'unit',
-      header: 'Unit',
-      render: row => {
-        const vehicle = row.vehicleId ? vehicles.find(v => v.id === row.vehicleId) : null
-        const trailer = row.trailerId ? trailers.find(t => t.id === row.trailerId) : null
-        const unit = vehicle ?? trailer
-        const carrier = unit ? carriers.find(c => c.id === unit.carrierId) : null
-        return (
-          <div>
-            <div className="font-medium text-gray-900">{vehicle?.vehicleNumber ?? trailer?.trailerNumber ?? '—'}</div>
-            <div className="text-[11px] text-gray-400 truncate max-w-[140px]">{carrier?.name ?? ''}</div>
-          </div>
-        )
-      },
-    },
-    {
-      key: 'plan',
-      header: 'Maintenance Plan',
-      render: row => {
-        const plan = maintenancePlans.find(p => p.id === row.maintenancePlanId)
-        const type = plan ? maintenanceTypes.find(t => t.id === plan.maintenanceTypeId) : null
-        return (
-          <div>
-            <div className="text-gray-900">{plan?.name ?? '—'}</div>
-            <div className="text-[11px] text-gray-400">{type?.name ?? ''}</div>
-          </div>
-        )
-      },
-    },
-    {
-      key: 'unitType',
-      header: 'Type',
-      width: 'w-24',
-      render: row => <span className="text-gray-600 text-[12px]">{row.unitType}</span>,
-    },
-    {
-      key: 'lastService',
-      header: 'Last Service',
-      width: 'w-32',
-      render: row => (
-        <div>
-          <div className="text-gray-600">{row.lastServiceDate ? formatDate(row.lastServiceDate) : '—'}</div>
-          {row.lastServiceMileage && (
-            <div className="text-[11px] text-gray-400">{row.lastServiceMileage.toLocaleString()} mi</div>
-          )}
-        </div>
-      ),
-    },
-    {
-      key: 'dueAt',
-      header: 'Due At',
-      width: 'w-32',
-      render: row => (
-        <div>
-          {row.dueDate && <div className="text-gray-600">{formatDate(row.dueDate)}</div>}
-          {row.dueMileage && <div className="text-[11px] text-gray-400">{row.dueMileage.toLocaleString()} mi</div>}
-        </div>
-      ),
-    },
-    {
-      key: 'dueIn',
-      header: 'Due In',
-      width: 'w-28',
-      render: row => (
-        <span className={`text-[13px] font-medium ${row.dueStatus === 'Overdue' ? 'text-red-600' : row.dueStatus === 'Upcoming' ? 'text-yellow-600' : 'text-green-600'}`}>
-          {row.dueIn}
-        </span>
-      ),
-    },
-    {
-      key: 'status',
-      header: 'Status',
-      width: 'w-28',
-      render: row => <DueStatusBadge status={row.dueStatus} />,
-    },
-    {
-      key: 'actions',
-      header: '',
-      width: 'w-24',
-      render: row => (
-        <Button size="sm" variant="ghost" onClick={() => handleLogMaintenance(row)} className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
-          <Wrench size={13} />
-          Log
-        </Button>
-      ),
-    },
-  ]
-
-  const exportRows = filtered.map(rec => {
-    const vehicle = rec.vehicleId ? vehicles.find(v => v.id === rec.vehicleId) : null
-    const trailer = rec.trailerId ? trailers.find(t => t.id === rec.trailerId) : null
-    const plan = maintenancePlans.find(p => p.id === rec.maintenancePlanId)
-    return {
-      'Unit': vehicle?.vehicleNumber ?? trailer?.trailerNumber ?? '',
-      'Unit Type': rec.unitType,
-      'Plan': plan?.name ?? '',
-      'Last Service': rec.lastServiceDate ?? '',
-      'Last Mileage': rec.lastServiceMileage ?? '',
-      'Current Mileage': rec.currentMileage ?? '',
-      'Due Date': rec.dueDate ?? '',
-      'Due Mileage': rec.dueMileage ?? '',
-      'Due In': rec.dueIn,
-      'Status': rec.dueStatus,
-    }
-  })
-
-  const counts = {
-    all: dueMaintenance.length,
-    overdue: dueMaintenance.filter(r => r.dueStatus === 'Overdue').length,
-    upcoming: dueMaintenance.filter(r => r.dueStatus === 'Upcoming').length,
-    ok: dueMaintenance.filter(r => r.dueStatus === 'OK').length,
-  }
+  const TABS = [{ key: 'mileage', label: 'By Mileage' }, { key: 'date', label: 'By Date' }] as const
 
   return (
     <div className="flex flex-col h-full">
-      <PageHeader
-        title="Due Maintenance"
-        actions={
-          <ExportButton filename="due-maintenance" columns={Object.keys(exportRows[0] ?? {})} rows={exportRows} />
-        }
-        filters={
-          <>
-            <SearchInput value={search} onChange={setSearch} placeholder="Search..." />
-            <Select
-              value={statusFilter}
-              onValueChange={setStatusFilter}
-              options={[
-                { value: 'all', label: `All (${counts.all})` },
-                { value: 'Overdue', label: `Overdue (${counts.overdue})` },
-                { value: 'Upcoming', label: `Upcoming (${counts.upcoming})` },
-                { value: 'OK', label: `OK (${counts.ok})` },
-              ]}
-              triggerClassName="h-8 text-[12px] w-44"
-            />
-            <Select
-              value={unitFilter}
-              onValueChange={setUnitFilter}
-              options={[{ value: 'all', label: 'All Units' }, { value: 'Vehicle', label: 'Vehicles' }, { value: 'Trailer', label: 'Trailers' }]}
-              triggerClassName="h-8 text-[12px] w-36"
-            />
-          </>
-        }
-      />
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h2 className="text-2xl font-semibold text-on-surface">Due Maintenance</h2>
+            <p className="text-sm text-on-surface-variant mt-0.5">Review and manage upcoming and overdue service requirements.</p>
+          </div>
+          <button className="border border-border text-on-surface px-4 py-2 rounded text-sm hover:bg-surface-container-low transition-colors flex items-center gap-2">
+            <span className="material-symbols-outlined text-[18px]">download</span> Export
+          </button>
+        </div>
 
-      {/* Summary chips */}
-      <div className="px-6 py-3 bg-white border-b border-gray-100 flex gap-3">
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-red-50 rounded-md">
-          <span className="w-2 h-2 rounded-full bg-red-500" />
-          <span className="text-[12px] font-medium text-red-700">{counts.overdue} Overdue</span>
-        </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-yellow-50 rounded-md">
-          <span className="w-2 h-2 rounded-full bg-yellow-500" />
-          <span className="text-[12px] font-medium text-yellow-700">{counts.upcoming} Upcoming</span>
-        </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 rounded-md">
-          <span className="w-2 h-2 rounded-full bg-green-500" />
-          <span className="text-[12px] font-medium text-green-700">{counts.ok} OK</span>
+        {/* Tabs + filter */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="flex gap-1 p-1 bg-surface border border-border rounded-lg">
+            {TABS.map(t => (
+              <button
+                key={t.key}
+                onClick={() => { setTab(t.key); setPage(1) }}
+                className={cn(
+                  'px-6 py-2 rounded text-sm font-medium transition-colors',
+                  tab === t.key
+                    ? 'bg-surface-container-high text-on-surface border border-border shadow-sm'
+                    : 'text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface'
+                )}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-on-surface-variant font-mono">Filter:</span>
+            <select
+              value={unitFilter}
+              onChange={e => { setUnitFilter(e.target.value); setPage(1) }}
+              className="bg-surface-container-low border border-border text-sm text-on-surface rounded py-1 pl-3 pr-8 outline-none focus:border-primary"
+            >
+              <option value="all">All Units</option>
+              <option value="truck">Trucks</option>
+              <option value="trailer">Trailers</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={filtered}
-        getRowId={r => r.id}
-        emptyMessage="No due maintenance records."
-      />
+      {/* Table */}
+      <div className="flex-1 overflow-auto mx-6 mb-6 bg-surface rounded-lg border border-border overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse whitespace-nowrap">
+            <thead>
+              <tr className="bg-surface-container-low border-b border-border">
+                {['Unit No.', 'Type', 'Plan Name', 'Maintenance Type', 'Last Service (Mi)', 'Current (Mi)', 'Due In', 'Actions'].map(h => (
+                  <th key={h} className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-on-surface-variant font-mono">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border text-sm">
+              {paged.length === 0 ? (
+                <tr><td colSpan={8} className="px-4 py-12 text-center text-sm text-outline">No records found.</td></tr>
+              ) : (
+                paged.map((r, i) => (
+                  <motion.tr
+                    key={r.id}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.15, delay: i * 0.02 }}
+                    className="group hover:bg-surface-container-lowest/50 transition-colors"
+                  >
+                    <td className="px-4 py-3 font-medium text-on-surface font-mono text-xs">{getUnitNum(r)}</td>
+                    <td className="px-4 py-3 text-on-surface-variant">{r.unitType}</td>
+                    <td className="px-4 py-3 text-on-surface">{getPlanName(r)}</td>
+                    <td className="px-4 py-3 text-on-surface-variant">{getTypeName(r)}</td>
+                    <td className="px-4 py-3 text-right font-mono text-xs text-on-surface-variant">
+                      {r.lastServiceMileage?.toLocaleString() ?? '—'}
+                    </td>
+                    <td className="px-4 py-3 text-right font-mono text-xs text-on-surface">
+                      {r.currentMileage?.toLocaleString() ?? '—'}
+                    </td>
+                    <td className="px-4 py-3 text-right"><DueInChip dueIn={r.dueIn} /></td>
+                    <td className="px-4 py-3 text-center">
+                      <button className="text-primary-container text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1 mx-auto">
+                        <span className="material-symbols-outlined text-[16px]">add_task</span> Log
+                      </button>
+                    </td>
+                  </motion.tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
 
-      <LogModal
-        open={logModalOpen}
-        onOpenChange={v => { setLogModalOpen(v); if (!v) setPrefill({}) }}
-        prefillVehicleId={prefill.vehicleId}
-        prefillTrailerId={prefill.trailerId}
-        prefillPlanId={prefill.planId}
-      />
+        <div className="p-4 border-t border-border flex justify-between items-center bg-surface-container-lowest">
+          <span className="text-xs text-on-surface-variant font-mono">
+            Showing {filtered.length === 0 ? 0 : (page - 1) * ROWS_PER_PAGE + 1} to {Math.min(page * ROWS_PER_PAGE, filtered.length)} of {filtered.length} entries
+          </span>
+          <div className="flex gap-1">
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="p-1 border border-border rounded text-on-surface-variant hover:bg-surface hover:text-on-surface transition-colors disabled:opacity-40">
+              <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+            </button>
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="p-1 border border-border rounded text-on-surface-variant hover:bg-surface hover:text-on-surface transition-colors disabled:opacity-40">
+              <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

@@ -24,34 +24,41 @@ export function TruckDetailsModal({ open, onOpenChange, plan }: TruckDetailsModa
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent title={`${plan.name} — Assigned Vehicles`} size="lg">
         <div className="px-5 py-4">
-          <div className="mb-4 p-3 bg-gray-50 rounded-md text-[13px] text-gray-600 grid grid-cols-3 gap-3">
-            <div><span className="text-gray-400 text-[11px] uppercase font-semibold">Type</span><div className="mt-1">{maintenanceType?.name ?? '—'}</div></div>
-            <div><span className="text-gray-400 text-[11px] uppercase font-semibold">Interval</span><div className="mt-1">{plan.interval} {plan.intervalType}</div></div>
-            <div><span className="text-gray-400 text-[11px] uppercase font-semibold">Status</span><div className="mt-1"><ActiveStatusBadge active={plan.status} /></div></div>
+          <div className="mb-4 p-3 bg-surface-container rounded text-sm text-on-surface-variant grid grid-cols-3 gap-3">
+            <div>
+              <span className="text-on-surface-variant text-[11px] uppercase font-mono tracking-wider">Type</span>
+              <div className="mt-1 text-on-surface">{maintenanceType?.name ?? '—'}</div>
+            </div>
+            <div>
+              <span className="text-on-surface-variant text-[11px] uppercase font-mono tracking-wider">Interval</span>
+              <div className="mt-1 text-on-surface font-mono">{plan.interval} {plan.intervalType}</div>
+            </div>
+            <div>
+              <span className="text-on-surface-variant text-[11px] uppercase font-mono tracking-wider">Status</span>
+              <div className="mt-1"><ActiveStatusBadge active={plan.status} /></div>
+            </div>
           </div>
 
           {assignedVehicles.length === 0 ? (
-            <p className="text-[13px] text-gray-400 py-6 text-center">No vehicles assigned to this plan yet.</p>
+            <p className="text-sm text-outline py-6 text-center">No vehicles assigned to this plan yet.</p>
           ) : (
-            <table className="w-full text-[13px]">
+            <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase">Vehicle #</th>
-                  <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase">Carrier</th>
-                  <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase">Terminal</th>
-                  <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase">Mileage</th>
-                  <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase">Status</th>
+                <tr className="bg-surface-container-low border-b border-border">
+                  {['Vehicle #', 'Carrier', 'Terminal', 'Mileage', 'Status'].map(h => (
+                    <th key={h} className="px-3 py-2 text-left text-[11px] font-semibold text-on-surface-variant uppercase font-mono">{h}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {assignedVehicles.map(v => {
                   const carrier = carriers.find(c => c.id === v.carrierId)
                   return (
-                    <tr key={v.id} className="border-b border-gray-100 hover:bg-gray-50">
-                      <td className="px-3 py-2.5 font-medium text-gray-900">{v.vehicleNumber}</td>
-                      <td className="px-3 py-2.5 text-gray-600">{carrier?.name ?? '—'}</td>
-                      <td className="px-3 py-2.5 text-gray-600">{v.terminal}</td>
-                      <td className="px-3 py-2.5 text-gray-600">{v.currentMileage.toLocaleString()}</td>
+                    <tr key={v.id} className="border-b border-border hover:bg-surface-container-lowest/50 transition-colors">
+                      <td className="px-3 py-2.5 font-medium text-on-surface font-mono text-xs">{v.vehicleNumber}</td>
+                      <td className="px-3 py-2.5 text-on-surface-variant">{carrier?.name ?? '—'}</td>
+                      <td className="px-3 py-2.5 text-on-surface-variant">{v.terminal}</td>
+                      <td className="px-3 py-2.5 text-on-surface-variant font-mono text-xs">{v.currentMileage.toLocaleString()}</td>
                       <td className="px-3 py-2.5"><ActiveStatusBadge active={v.status === 'Active'} /></td>
                     </tr>
                   )

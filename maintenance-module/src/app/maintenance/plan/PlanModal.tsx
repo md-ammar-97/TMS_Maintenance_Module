@@ -117,25 +117,25 @@ export function PlanModal({ open, onOpenChange, editItem }: PlanModalProps) {
             </div>
           </div>
 
-          <div className="border border-gray-100 rounded-md p-3 flex flex-col gap-3">
+          <div className="border border-border rounded p-3 flex flex-col gap-3 bg-surface-container-low">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-[13px] font-medium text-gray-700">Validate Upcoming at Dispatch</div>
-                <div className="text-[11px] text-gray-500">Warn when maintenance is upcoming</div>
+                <div className="text-sm font-medium text-on-surface">Validate Upcoming at Dispatch</div>
+                <div className="text-xs text-on-surface-variant mt-0.5">Warn when maintenance is upcoming</div>
               </div>
               <Switch checked={validateUpcoming} onCheckedChange={setValidateUpcoming} />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-[13px] font-medium text-gray-700">Validate Due at Dispatch</div>
-                <div className="text-[11px] text-gray-500">Block dispatch when maintenance is due</div>
+                <div className="text-sm font-medium text-on-surface">Validate Due at Dispatch</div>
+                <div className="text-xs text-on-surface-variant mt-0.5">Block dispatch when maintenance is due</div>
               </div>
               <Switch checked={validateDue} onCheckedChange={setValidateDue} />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-[13px] font-medium text-gray-700">Status</div>
-                <div className="text-[11px] text-gray-500">Active / Inactive</div>
+                <div className="text-sm font-medium text-on-surface">Status</div>
+                <div className="text-xs text-on-surface-variant mt-0.5">Active / Inactive</div>
               </div>
               <Switch checked={status} onCheckedChange={setStatus} />
             </div>

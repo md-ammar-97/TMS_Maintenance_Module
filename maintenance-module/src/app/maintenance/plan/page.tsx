@@ -1,146 +1,207 @@
 'use client'
 
-import { useState } from 'react'
-import { Plus, Truck } from 'lucide-react'
+import { useState, useMemo } from 'react'
 import { toast } from 'sonner'
 import { useApp } from '@/context/AppContext'
-import { PageHeader } from '@/components/shared/PageHeader'
 import { DataTable, type Column } from '@/components/shared/DataTable'
 import { RowActionsMenu } from '@/components/shared/RowActionsMenu'
 import { ConfirmDeleteDialog } from '@/components/shared/ConfirmDeleteDialog'
-import { SearchInput } from '@/components/shared/SearchInput'
-import { ActiveStatusBadge } from '@/components/shared/StatusBadge'
-import { Button } from '@/components/ui/button'
 import { PlanModal } from './PlanModal'
 import { TruckDetailsModal } from './TruckDetailsModal'
 import type { MaintenancePlan } from '@/types'
+import { cn } from '@/lib/utils'
+
+const ROWS_PER_PAGE = 10
 
 export default function PlanPage() {
   const { maintenancePlans, maintenanceTypes, deleteMaintenancePlan } = useApp()
   const [search, setSearch] = useState('')
+  const [filterType, setFilterType] = useState('all')
+  const [filterStatus, setFilterStatus] = useState('all')
   const [modalOpen, setModalOpen] = useState(false)
-  const [editItem, setEditItem] = useState<MaintenancePlan | null>(null)
+  const [editPlan, setEditPlan] = useState<MaintenancePlan | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
-  const [viewPlan, setViewPlan] = useState<MaintenancePlan | null>(null)
+  const [truckDetailId, setTruckDetailId] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
 
-  const filtered = maintenancePlans.filter(p =>
-    p.name.toLowerCase().includes(search.toLowerCase()) ||
-    (maintenanceTypes.find(t => t.id === p.maintenanceTypeId)?.name ?? '').toLowerCase().includes(search.toLowerCase())
-  )
+  const filtered = useMemo(() => {
+    let rows = maintenancePlans
+    if (search)                 rows = rows.filter(p => p.name.toLowerCase().includes(search.toLowerCase()))
+    if (filterType !== 'all')   rows = rows.filter(p => p.maintenanceTypeId === filterType)
+    if (filterStatus === 'active')   rows = rows.filter(p => p.status)
+    if (filterStatus === 'inactive') rows = rows.filter(p => !p.status)
+    return rows
+  }, [maintenancePlans, search, filterType, filterStatus])
 
-  function handleDelete(id: string) {
-    deleteMaintenancePlan(id)
-    toast.success('Plan deleted')
-  }
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ROWS_PER_PAGE))
+  const paged = filtered.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE)
 
   const columns: Column<MaintenancePlan>[] = [
     {
-      key: 'name',
-      header: 'Plan Name',
-      render: row => <span className="font-medium text-gray-900">{row.name}</span>,
-    },
-    {
-      key: 'type',
-      header: 'Maintenance Type',
-      render: row => {
-        const t = maintenanceTypes.find(x => x.id === row.maintenanceTypeId)
-        return <span className="text-gray-600">{t?.name ?? '—'}</span>
-      },
-    },
-    {
-      key: 'interval',
-      header: 'Interval',
-      render: row => <span className="text-gray-600">{row.interval.toLocaleString()} {row.intervalType}</span>,
-    },
-    {
-      key: 'dispatch',
-      header: 'Dispatch Validation',
-      render: row => (
-        <div className="flex gap-2 text-[11px]">
-          {row.validateUpcomingAtDispatch && (
-            <span className="bg-yellow-50 text-yellow-700 px-1.5 py-0.5 rounded">Upcoming</span>
-          )}
-          {row.validateDueAtDispatch && (
-            <span className="bg-red-50 text-red-700 px-1.5 py-0.5 rounded">Due</span>
-          )}
-          {!row.validateUpcomingAtDispatch && !row.validateDueAtDispatch && (
-            <span className="text-gray-400">None</span>
-          )}
-        </div>
-      ),
-    },
-    {
-      key: 'status',
-      header: 'Status',
-      width: 'w-24',
-      render: row => <ActiveStatusBadge active={row.status} />,
-    },
-    {
-      key: 'trucks',
-      header: 'Trucks',
-      width: 'w-24',
-      render: row => (
-        <button
-          className="flex items-center gap-1 text-blue-600 hover:text-blue-700 text-[12px] font-medium"
-          onClick={e => { e.stopPropagation(); setViewPlan(row) }}
-        >
-          <Truck size={12} />
-          View
-        </button>
-      ),
-    },
-    {
-      key: 'actions',
-      header: '',
-      width: 'w-12',
+      key: 'actions', header: 'Actions', width: 'w-16',
       render: row => (
         <RowActionsMenu
-          onEdit={() => { setEditItem(row); setModalOpen(true) }}
+          onEdit={() => { setEditPlan(row); setModalOpen(true) }}
           onDelete={() => setDeleteId(row.id)}
+          onView={() => setTruckDetailId(row.id)}
         />
       ),
+    },
+    {
+      key: 'name', header: 'Name',
+      render: row => <span className={cn('font-medium text-sm', !row.status && 'opacity-60')} style={{ color: 'var(--color-primary-fixed-dim)' }}>{row.name}</span>,
+    },
+    {
+      key: 'type', header: 'Maintenance Type',
+      render: row => <span className="text-sm text-on-surface-variant">{maintenanceTypes.find(t => t.id === row.maintenanceTypeId)?.name ?? '—'}</span>,
+    },
+    {
+      key: 'intervalType', header: 'Interval Type',
+      render: row => <span className="text-sm text-on-surface-variant font-mono">{row.intervalType}</span>,
+    },
+    {
+      key: 'interval', header: 'Interval',
+      render: row => <span className="text-sm text-on-surface font-mono">{row.interval.toLocaleString()}</span>,
+    },
+    {
+      key: 'status', header: 'Status',
+      render: row => row.status
+        ? <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-success/10 text-success border border-success/20">Active</span>
+        : <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface-container-highest text-on-surface-variant border border-outline-variant">Inactive</span>,
+    },
+    {
+      key: 'description', header: 'Description',
+      render: row => <span className="text-sm text-on-surface-variant truncate max-w-xs block">{row.description || '—'}</span>,
+    },
+    {
+      key: 'overdue', header: 'Total Overdue',
+      render: () => <span className="text-sm text-error font-medium font-mono">0</span>,
     },
   ]
 
   return (
     <div className="flex flex-col h-full">
-      <PageHeader
-        title="Maintenance Plans"
-        actions={
-          <Button onClick={() => { setEditItem(null); setModalOpen(true) }}>
-            <Plus size={14} />
+      {/* Header */}
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h2 className="text-2xl font-semibold text-on-surface">Plan</h2>
+            <p className="text-sm text-on-surface-variant mt-0.5">Manage maintenance plans and service schedules.</p>
+          </div>
+          <button
+            onClick={() => { setEditPlan(null); setModalOpen(true) }}
+            className="bg-primary-container text-on-primary-container hover:bg-inverse-primary transition-colors py-2 px-4 rounded font-medium text-sm flex items-center gap-2"
+          >
+            <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>add</span>
             Add Plan
-          </Button>
-        }
-        filters={
-          <SearchInput value={search} onChange={setSearch} placeholder="Search plans..." />
-        }
-      />
+          </button>
+        </div>
 
-      <DataTable
-        columns={columns}
-        data={filtered}
-        getRowId={r => r.id}
-        emptyMessage="No plans yet."
-      />
+        {/* Filters */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative flex items-center">
+            <span className="material-symbols-outlined absolute left-3 text-on-surface-variant text-[16px]">search</span>
+            <input
+              value={search}
+              onChange={e => { setSearch(e.target.value); setPage(1) }}
+              placeholder="Search plans..."
+              className="h-9 pl-9 pr-3 text-sm rounded border bg-surface-container-low border-border text-on-surface placeholder:text-outline outline-none focus:ring-1 focus:ring-primary focus:border-primary w-52 transition-colors"
+            />
+          </div>
+
+          <select
+            value={filterType}
+            onChange={e => { setFilterType(e.target.value); setPage(1) }}
+            className="h-9 px-3 pr-8 text-sm rounded border bg-surface-container-low border-border text-on-surface outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors"
+          >
+            <option value="all">All Types</option>
+            {maintenanceTypes.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+          </select>
+
+          <select
+            value={filterStatus}
+            onChange={e => { setFilterStatus(e.target.value); setPage(1) }}
+            className="h-9 px-3 pr-8 text-sm rounded border bg-surface-container-low border-border text-on-surface outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors"
+          >
+            <option value="all">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+
+          <button className="border border-border text-on-surface px-4 py-2 rounded text-sm hover:bg-surface-container-low transition-colors flex items-center gap-2 ml-auto">
+            <span className="material-symbols-outlined text-[16px]">download</span> Export
+          </button>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="flex-1 overflow-auto mx-6 mb-6 bg-surface rounded-lg border border-border overflow-hidden">
+        <DataTable
+          columns={columns}
+          data={paged}
+          getRowId={r => r.id}
+          emptyMessage="No maintenance plans found."
+        />
+
+        {/* Pagination */}
+        <div className="p-4 border-t border-border flex justify-between items-center bg-surface-container-lowest">
+          <span className="text-xs text-on-surface-variant font-mono">
+            Showing {filtered.length === 0 ? 0 : (page - 1) * ROWS_PER_PAGE + 1} to {Math.min(page * ROWS_PER_PAGE, filtered.length)} of {filtered.length} results
+          </span>
+          <div className="flex gap-1">
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="p-1 border border-border rounded text-on-surface-variant hover:bg-surface hover:text-on-surface transition-colors disabled:opacity-40"
+            >
+              <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+            </button>
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => i + 1).map(n => (
+              <button
+                key={n}
+                onClick={() => setPage(n)}
+                className={cn(
+                  'px-2.5 py-1 border rounded text-xs font-medium transition-colors',
+                  page === n
+                    ? 'border-primary-container text-primary-container bg-primary-container/10'
+                    : 'border-border text-on-surface-variant hover:bg-surface hover:text-on-surface'
+                )}
+              >
+                {n}
+              </button>
+            ))}
+            {totalPages > 5 && <span className="px-2 py-1 text-on-surface-variant text-xs">...</span>}
+            <button
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="p-1 border border-border rounded text-on-surface-variant hover:bg-surface hover:text-on-surface transition-colors disabled:opacity-40"
+            >
+              <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
       <PlanModal
         open={modalOpen}
-        onOpenChange={v => { setModalOpen(v); if (!v) setEditItem(null) }}
-        editItem={editItem}
+        onOpenChange={v => { setModalOpen(v); if (!v) setEditPlan(null) }}
+        editItem={editPlan}
       />
 
       <TruckDetailsModal
-        open={!!viewPlan}
-        onOpenChange={v => { if (!v) setViewPlan(null) }}
-        plan={viewPlan}
+        open={!!truckDetailId}
+        onOpenChange={v => !v && setTruckDetailId(null)}
+        plan={maintenancePlans.find(p => p.id === truckDetailId) ?? null}
       />
 
       <ConfirmDeleteDialog
         open={!!deleteId}
-        onOpenChange={v => { if (!v) setDeleteId(null) }}
-        onConfirm={() => { if (deleteId) handleDelete(deleteId) }}
-        description="This plan will be permanently removed."
+        onOpenChange={v => !v && setDeleteId(null)}
+        onConfirm={() => {
+          if (deleteId) { deleteMaintenancePlan(deleteId); toast.success('Plan deleted') }
+        }}
+        title="Delete Plan"
+        description="This maintenance plan will be permanently deleted."
       />
     </div>
   )

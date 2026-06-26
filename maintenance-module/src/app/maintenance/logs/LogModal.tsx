@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useApp } from '@/context/AppContext'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
@@ -143,7 +142,7 @@ export function LogModal({ open, onOpenChange, editItem, prefillVehicleId, prefi
                 <button
                   key={t}
                   onClick={() => setUnitType(t)}
-                  className={`flex-1 h-9 text-[13px] rounded-md border transition-colors ${unitType === t ? 'border-blue-600 bg-blue-50 text-blue-700 font-medium' : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'}`}
+                  className={`flex-1 h-9 text-sm rounded border transition-colors font-medium ${unitType === t ? 'border-primary-container bg-primary-container/10 text-primary-container' : 'border-border bg-transparent text-on-surface-variant hover:border-outline hover:text-on-surface'}`}
                 >
                   {t}
                 </button>

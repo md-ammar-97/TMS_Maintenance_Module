@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useApp } from '@/context/AppContext'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
@@ -187,7 +186,7 @@ export function BillModal({ open, onOpenChange, editItem }: BillModalProps) {
                 <button
                   key={t}
                   onClick={() => setUnitType(t)}
-                  className={`flex-1 h-9 text-[13px] rounded-md border transition-colors ${unitType === t ? 'border-blue-600 bg-blue-50 text-blue-700 font-medium' : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'}`}
+                  className={`flex-1 h-9 text-sm rounded border transition-colors font-medium ${unitType === t ? 'border-primary-container bg-primary-container/10 text-primary-container' : 'border-border bg-transparent text-on-surface-variant hover:border-outline hover:text-on-surface'}`}
                 >
                   {t}
                 </button>
@@ -270,19 +269,19 @@ export function BillModal({ open, onOpenChange, editItem }: BillModalProps) {
           <div>
             <div className="flex items-center justify-between mb-2">
               <Label className="mb-0">Line Items</Label>
-              <button onClick={addLineItem} className="text-[12px] text-blue-600 hover:text-blue-700 flex items-center gap-1">
-                <Plus size={12} /> Add Item
+              <button onClick={addLineItem} className="text-xs text-primary flex items-center gap-1 hover:text-primary-container transition-colors">
+                <span className="material-symbols-outlined text-[14px]">add</span> Add Item
               </button>
             </div>
-            {errors.items && <p className="text-[11px] text-red-500 mb-2">{errors.items}</p>}
+            {errors.items && <p className="text-[11px] text-error mb-2">{errors.items}</p>}
             <div className="flex flex-col gap-2">
               {logItems.map((item, idx) => (
-                <div key={item.id} className="border border-gray-100 rounded-md p-3 bg-gray-50">
+                <div key={item.id} className="border border-border rounded p-3 bg-surface-container-low">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-semibold text-gray-500 uppercase">Item {idx + 1}</span>
+                    <span className="text-[11px] font-semibold text-on-surface-variant uppercase font-mono">Item {idx + 1}</span>
                     {logItems.length > 1 && (
-                      <button onClick={() => removeLineItem(item.id)} className="text-red-500 hover:text-red-700">
-                        <Trash2 size={13} />
+                      <button onClick={() => removeLineItem(item.id)} className="text-error hover:text-error/80 p-0.5 rounded hover:bg-error/10 transition-colors">
+                        <span className="material-symbols-outlined text-[14px]">delete</span>
                       </button>
                     )}
                   </div>
@@ -333,7 +332,7 @@ export function BillModal({ open, onOpenChange, editItem }: BillModalProps) {
             </div>
 
             {logItems.length > 0 && (
-              <div className="flex justify-end mt-2 text-[13px] font-semibold text-gray-900">
+              <div className="flex justify-end mt-2 text-sm font-semibold text-on-surface font-mono">
                 Total: {currency} {totalAmount.toFixed(2)}
               </div>
             )}
