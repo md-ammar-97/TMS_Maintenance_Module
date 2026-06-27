@@ -9,13 +9,19 @@ import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { cn, getUnitOptionLabel } from '@/lib/utils'
 import { INSPECTORS, TRAILER_INSPECTION_ITEMS, VEHICLE_INSPECTION_ITEMS } from '@/types'
-import type { InspectionItemResult, UnitType } from '@/types'
+import type { Inspection, InspectionItemResult, UnitType } from '@/types'
 
 type ItemResult = { itemNumber: number; description: string; result: InspectionItemResult }
 
+function createInspectionItems(unitType: UnitType): ItemResult[] {
+  const baseItems = unitType === 'Vehicle' ? VEHICLE_INSPECTION_ITEMS : TRAILER_INSPECTION_ITEMS
+  return baseItems.map(item => ({ ...item, result: 'NA' }))
+}
+
 export default function NewInspectionPage() {
   const router = useRouter()
-  const { vehicles, trailers, carriers, addInspection } = useApp()
+  const { vehicles, trailers, carriers, inspections, addInspection, updateInspection } = useApp()
+  const [editId, setEditId] = useState<string | null>(null)
   const [unitType, setUnitType] = useState<UnitType>('Vehicle')
   const [carrierId, setCarrierId] = useState('')
   const [vehicleId, setVehicleId] = useState('')
@@ -23,26 +29,40 @@ export default function NewInspectionPage() {
   const [inspectionDate, setInspectionDate] = useState(new Date().toISOString().split('T')[0])
   const [inspectionBy, setInspectionBy] = useState('')
   const [mileage, setMileage] = useState('')
-  const [items, setItems] = useState<ItemResult[]>([])
+  const [items, setItems] = useState<ItemResult[]>(() => createInspectionItems('Vehicle'))
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
+    const requestedEditId = params.get('edit')
     const type = params.get('type')
     const unit = params.get('unit')
+
+    if (requestedEditId) {
+      const inspection = inspections.find(item => item.id === requestedEditId)
+      if (!inspection) return
+      setEditId(inspection.id)
+      setUnitType(inspection.unitType)
+      setCarrierId(inspection.carrierId)
+      setVehicleId(inspection.vehicleId ?? '')
+      setTrailerId(inspection.trailerId ?? '')
+      setInspectionDate(inspection.inspectionDate)
+      setInspectionBy(inspection.inspectionBy)
+      setMileage(inspection.mileage == null ? '' : String(inspection.mileage))
+      setItems(inspection.items.map(item => ({ ...item })))
+      return
+    }
+
     if (type === 'trailer') {
       setUnitType('Trailer')
+      setItems(createInspectionItems('Trailer'))
       if (unit) setTrailerId(unit)
     } else if (type === 'vehicle') {
       setUnitType('Vehicle')
+      setItems(createInspectionItems('Vehicle'))
       if (unit) setVehicleId(unit)
     }
-  }, [])
-
-  useEffect(() => {
-    const baseItems = unitType === 'Vehicle' ? VEHICLE_INSPECTION_ITEMS : TRAILER_INSPECTION_ITEMS
-    setItems(baseItems.map(item => ({ ...item, result: 'NA' as InspectionItemResult })))
-  }, [unitType])
+  }, [inspections])
 
   useEffect(() => {
     const unit = unitType === 'Vehicle'
@@ -66,6 +86,15 @@ export default function NewInspectionPage() {
     setItems(prev => prev.map(item => ({ ...item, result })))
   }
 
+  function handleUnitTypeChange(type: UnitType) {
+    setUnitType(type)
+    setVehicleId('')
+    setTrailerId('')
+    setMileage('')
+    setCarrierId('')
+    setItems(createInspectionItems(type))
+  }
+
   function validate() {
     const nextErrors: Record<string, string> = {}
     if (!carrierId) nextErrors.carrierId = 'Carrier is required'
@@ -84,7 +113,7 @@ export default function NewInspectionPage() {
       return
     }
 
-    const saved = addInspection({
+    const inspectionData: Omit<Inspection, 'id' | 'createdAt'> = {
       unitType,
       vehicleId: unitType === 'Vehicle' ? vehicleId : undefined,
       trailerId: unitType === 'Trailer' ? trailerId : undefined,
@@ -93,9 +122,17 @@ export default function NewInspectionPage() {
       inspectionDate,
       inspectionBy,
       items,
-    })
-    toast.success('Inspection saved')
-    const unitId = saved.vehicleId ?? saved.trailerId
+    }
+
+    if (editId) {
+      updateInspection(editId, inspectionData)
+      toast.success('Inspection updated')
+    } else {
+      addInspection(inspectionData)
+      toast.success('Inspection saved')
+    }
+
+    const unitId = inspectionData.vehicleId ?? inspectionData.trailerId
     router.push(`/maintenance/inspection?type=${unitType.toLowerCase()}&unit=${unitId}`)
   }
 
@@ -108,12 +145,12 @@ export default function NewInspectionPage() {
           <span className="material-symbols-outlined text-[18px]">arrow_back</span>
         </button>
         <div>
-          <h1 className="text-xl font-semibold text-on-surface">Create new inspection</h1>
+          <h1 className="text-xl font-semibold text-on-surface">{editId ? 'Edit inspection' : 'Create new inspection'}</h1>
           <p className="text-xs text-on-surface-variant">{unitType} checklist</p>
         </div>
         <div className="ml-auto flex gap-2">
           <button onClick={() => router.push('/maintenance/inspection')} className="rounded border border-border px-4 py-2 text-sm text-on-surface-variant hover:bg-surface-container-low">Back to list</button>
-          <button onClick={handleSubmit} className="rounded bg-primary-container px-4 py-2 text-sm font-medium text-on-primary-container hover:bg-inverse-primary">Save</button>
+          <button onClick={handleSubmit} className="rounded bg-primary-container px-4 py-2 text-sm font-medium text-on-primary-container hover:bg-inverse-primary">{editId ? 'Save changes' : 'Save'}</button>
         </div>
       </div>
 
@@ -128,13 +165,7 @@ export default function NewInspectionPage() {
                   {(['Vehicle', 'Trailer'] as UnitType[]).map(type => (
                     <button
                       key={type}
-                      onClick={() => {
-                        setUnitType(type)
-                        setVehicleId('')
-                        setTrailerId('')
-                        setMileage('')
-                        setCarrierId('')
-                      }}
+                      onClick={() => handleUnitTypeChange(type)}
                       className={cn(
                         'h-9 flex-1 rounded border text-sm font-medium transition-colors',
                         unitType === type ? 'border-primary-container bg-primary-container/10 text-primary-container' : 'border-border text-on-surface-variant hover:border-outline'
@@ -224,7 +255,7 @@ export default function NewInspectionPage() {
 
           <div className="flex justify-end gap-2">
             <button onClick={() => router.push('/maintenance/inspection')} className="rounded border border-border px-4 py-2 text-sm text-on-surface-variant hover:bg-surface-container-low">Back to list</button>
-            <button onClick={handleSubmit} className="rounded bg-primary-container px-4 py-2 text-sm font-medium text-on-primary-container hover:bg-inverse-primary">Save</button>
+            <button onClick={handleSubmit} className="rounded bg-primary-container px-4 py-2 text-sm font-medium text-on-primary-container hover:bg-inverse-primary">{editId ? 'Save changes' : 'Save'}</button>
           </div>
         </div>
       </div>

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useApp } from '@/context/AppContext'
 import { cn, formatDate, formatMileage } from '@/lib/utils'
 import type { Inspection, UnitType } from '@/types'
+import { downloadInspectionPdf } from './inspectionPdf'
 
 function InspectionStatusBadge({ inspection }: { inspection: Inspection }) {
   const defects = inspection.items.filter(item => item.result === 'Def').length
@@ -78,6 +79,16 @@ export default function InspectionPage() {
     setSelectedUnitId('')
     setUnitSearch('')
     setCarrierFilter('all')
+  }
+
+  function handleInspectionDownload(inspection: Inspection) {
+    const unit = inspection.unitType === 'Vehicle'
+      ? vehicles.find(vehicle => vehicle.id === inspection.vehicleId)
+      : trailers.find(trailer => trailer.id === inspection.trailerId)
+    const unitNumber = unit && 'vehicleNumber' in unit ? unit.vehicleNumber : unit?.trailerNumber ?? 'Unknown Unit'
+    const carrierName = carriers.find(carrier => carrier.id === inspection.carrierId)?.name ?? 'Unknown Carrier'
+
+    downloadInspectionPdf({ inspection, unitNumber, carrierName })
   }
 
   return (
@@ -203,9 +214,24 @@ export default function InspectionPage() {
                     return (
                       <tr key={inspection.id} className="hover:bg-surface-container-low">
                         <td className="px-4 py-3">
-                          <button onClick={() => window.print()} className="rounded p-1 text-on-surface-variant hover:bg-surface-container-high hover:text-primary">
-                            <span className="material-symbols-outlined text-[16px]">download</span>
-                          </button>
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => handleInspectionDownload(inspection)}
+                              aria-label={`Download inspection report from ${formatDate(inspection.inspectionDate)}`}
+                              title="Download PDF"
+                              className="rounded p-1 text-on-surface-variant hover:bg-surface-container-high hover:text-primary"
+                            >
+                              <span className="material-symbols-outlined text-[16px]">download</span>
+                            </button>
+                            <Link
+                              href={`/maintenance/inspection/new?edit=${inspection.id}`}
+                              aria-label={`Edit inspection report from ${formatDate(inspection.inspectionDate)}`}
+                              title="Edit inspection"
+                              className="rounded p-1 text-on-surface-variant hover:bg-surface-container-high hover:text-primary"
+                            >
+                              <span className="material-symbols-outlined text-[16px]">edit</span>
+                            </Link>
+                          </div>
                         </td>
                         <td className="px-4 py-3 text-on-surface-variant">{formatDate(inspection.inspectionDate)}</td>
                         <td className="px-4 py-3 text-on-surface">{inspection.inspectionBy}</td>
